@@ -28,9 +28,9 @@ A React Native Expo mobile application for QRSay restaurant management system. T
 
 ### Prerequisites
 
--   Node.js (v14 or later)
+-   Node.js (v18 or later)
 -   npm or yarn
--   Expo CLI
+-   Expo CLI (v50 or later)
 
 ### Installation
 
@@ -86,6 +86,87 @@ qrsay-admin-frontend-react-native-expo-app/
 ## Backend API
 
 This app connects to the QRSay backend API. Make sure the backend server is running and accessible.
+
+## Troubleshooting
+
+### Gesture Handler Import Errors
+
+If you encounter any of these errors:
+
+-   `Unable to resolve "../handlersRegistry" from "node_modules\react-native-gesture-handler\src\handlers\gestures\GestureDetector.tsx"`
+-   `Unable to resolve "../../getReactNativeVersion" from "node_modules\react-native-gesture-handler\src\handlers\gestures\GestureDetector.tsx"`
+-   `Android Bundling failed` related to gesture handler imports
+-   `TypeError: Cannot read property 'install' of null` in GestureHandlerRootView
+
+Follow these steps:
+
+1. Run the comprehensive fix script:
+
+    ```bash
+    npm run fix-gesture-handler
+    ```
+
+    This script creates fallback implementations for all the missing modules and fixes import paths.
+
+2. If that doesn't work, run the clean install script:
+
+    ```bash
+    npm run clean
+    ```
+
+3. This will:
+
+    - Remove node_modules and other temporary directories
+    - Clean the npm cache
+    - Reinstall dependencies
+    - Apply patches to fix gesture handler issues
+    - Run the comprehensive fix-gesture-handler script
+    - Create fallback implementations for all missing modules
+
+4. If the issue persists, try starting with a cleared cache:
+
+    ```bash
+    npm run reset
+    ```
+
+5. The app includes a custom metro.config.js that provides fallback implementations for problematic modules. If you're still having issues, check that this file is properly configured.
+
+### Other Issues
+
+If you encounter other issues:
+
+1. Make sure you have the latest version of Expo CLI:
+
+    ```bash
+    npm install -g expo-cli
+    ```
+
+2. Check that your Node.js version is compatible with Expo SDK 52:
+
+    ```bash
+    node -v
+    ```
+
+    (Node.js 18.x or later is recommended)
+
+3. Try clearing the Metro bundler cache:
+
+    ```bash
+    expo start --clear
+    ```
+
+4. If all else fails, try a complete project reset:
+
+    ```bash
+    npm run reset-project
+    ```
+
+    This will perform a more thorough cleanup than the clean script, including:
+
+    - Removing all generated directories (node_modules, .expo, android, ios)
+    - Cleaning all caches (npm, Metro bundler, Expo)
+    - Reinstalling all dependencies
+    - Applying all fixes
 
 ## Contributing
 

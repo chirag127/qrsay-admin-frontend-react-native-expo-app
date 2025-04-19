@@ -1,0 +1,27 @@
+diff --git a/node_modules/react-native-gesture-handler/src/handlers/gestures/GestureDetector.tsx b/node_modules/react-native-gesture-handler/src/handlers/gestures/GestureDetector.tsx
+index 83c6bbb..e5a0e7c 100644
+--- a/node_modules/react-native-gesture-handler/src/handlers/gestures/GestureDetector.tsx
++++ b/node_modules/react-native-gesture-handler/src/handlers/gestures/GestureDetector.tsx
+@@ -1,7 +1,7 @@
+ import React from 'react';
+ import { Platform } from 'react-native';
+ import RNGestureHandlerModule from '../../RNGestureHandlerModule';
+-import { baseGestureHandlerWithMonitorProps } from '../handlersRegistry';
++import { baseGestureHandlerWithMonitorProps } from '../../handlers/handlersRegistry';
+ import { ValueOf } from '../../typeUtils';
+ import { GestureStateManager } from './gestureStateManager';
+-import { getReactNativeVersion } from '../../getReactNativeVersion';
++import { getReactNativeVersion } from '../../../getReactNativeVersion';
+ import { GestureUpdateEvent } from './gestureHandlerCommon';
+
+diff --git a/node_modules/react-native-gesture-handler/src/getReactNativeVersion.js b/node_modules/react-native-gesture-handler/src/getReactNativeVersion.js
+new file mode 100644
+index 0000000..e5a0e7c
+--- /dev/null
++++ b/node_modules/react-native-gesture-handler/src/getReactNativeVersion.js
+@@ -0,0 +1,5 @@
++
++// This is a fallback implementation for getReactNativeVersion
++export function getReactNativeVersion() {
++  return { major: 0, minor: 76 };
++}

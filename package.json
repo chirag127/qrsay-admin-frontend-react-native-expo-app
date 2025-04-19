@@ -6,7 +6,13 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "clean": "node clean-install.js",
+    "reset": "expo start --clear",
+    "reset-project": "node reset-project.js",
+    "postinstall": "patch-package && node fix-gesture-handler.js",
+    "fix-handlers": "node fix-handlers-registry.js",
+    "fix-gesture-handler": "node fix-gesture-handler.js"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.21.0",
@@ -36,7 +42,10 @@
     "socket.io-client": "^4.7.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "metro-react-native-babel-transformer": "^0.76.9",
+    "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0"
   },
   "private": true
 }

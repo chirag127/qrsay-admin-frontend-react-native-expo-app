@@ -8,6 +8,7 @@ import { AuthProvider } from "./src/context/AuthContext";
 import { RestaurantProvider } from "./src/context/RestaurantContext";
 import { OrderProvider } from "./src/context/OrderContext";
 import { WaiterCallProvider } from "./src/context/WaiterCallContext";
+import ErrorBoundary from "./src/components/common/ErrorBoundary";
 
 export default function App() {
     // Ignore specific warnings
@@ -15,7 +16,9 @@ export default function App() {
         LogBox.ignoreLogs([
             'Unsupported top level event type "topInsetsChange" dispatched',
             'Unable to resolve "../handlersRegistry"',
+            'Unable to resolve "../../getReactNativeVersion"',
             "[react-native-gesture-handler]",
+            "Android Bundling failed",
         ]);
 
         // Log any unhandled errors
@@ -33,18 +36,20 @@ export default function App() {
         }
     }, []);
     return (
-        <SafeAreaProvider>
-            <AuthProvider>
-                <RestaurantProvider>
-                    <OrderProvider>
-                        <WaiterCallProvider>
-                            <StatusBar style="light" />
-                            <AppNavigator />
-                        </WaiterCallProvider>
-                    </OrderProvider>
-                </RestaurantProvider>
-            </AuthProvider>
-        </SafeAreaProvider>
+        <ErrorBoundary>
+            <SafeAreaProvider>
+                <AuthProvider>
+                    <RestaurantProvider>
+                        <OrderProvider>
+                            <WaiterCallProvider>
+                                <StatusBar style="light" />
+                                <AppNavigator />
+                            </WaiterCallProvider>
+                        </OrderProvider>
+                    </RestaurantProvider>
+                </AuthProvider>
+            </SafeAreaProvider>
+        </ErrorBoundary>
     );
 }
 

@@ -4,7 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useAuth } from "../context/AuthContext";
-import LoadingScreen from "../components/common/LoadingScreen";
+import { LoadingScreen, CustomGestureHandler } from "../components";
 
 // Auth screens
 import LoginScreen from "../screens/auth/LoginScreen";
@@ -305,9 +305,11 @@ const AppNavigator = () => {
     }
 
     return (
-        <NavigationContainer>
-            {user ? <DrawerNavigator /> : <AuthNavigator />}
-        </NavigationContainer>
+        <CustomGestureHandler>
+            <NavigationContainer>
+                {user ? <DrawerNavigator /> : <AuthNavigator />}
+            </NavigationContainer>
+        </CustomGestureHandler>
     );
 };
 
