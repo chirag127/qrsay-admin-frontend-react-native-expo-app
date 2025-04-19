@@ -1,20 +1,56 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import "react-native-gesture-handler";
+import React, { useEffect } from "react";
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View, LogBox } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import AppNavigator from "./src/navigation/AppNavigator";
+import { AuthProvider } from "./src/context/AuthContext";
+import { RestaurantProvider } from "./src/context/RestaurantContext";
+import { OrderProvider } from "./src/context/OrderContext";
+import { WaiterCallProvider } from "./src/context/WaiterCallContext";
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    // Ignore specific warnings
+    useEffect(() => {
+        LogBox.ignoreLogs([
+            'Unsupported top level event type "topInsetsChange" dispatched',
+            'Unable to resolve "../handlersRegistry"',
+            "[react-native-gesture-handler]",
+        ]);
+
+        // Log any unhandled errors
+        const handleError = (error) => {
+            console.log("Unhandled error:", error);
+        };
+
+        // Add error event listener
+        if (global.ErrorUtils) {
+            const previousHandler = global.ErrorUtils.getGlobalHandler();
+            global.ErrorUtils.setGlobalHandler((error, isFatal) => {
+                handleError(error);
+                previousHandler(error, isFatal);
+            });
+        }
+    }, []);
+    return (
+        <SafeAreaProvider>
+            <AuthProvider>
+                <RestaurantProvider>
+                    <OrderProvider>
+                        <WaiterCallProvider>
+                            <StatusBar style="light" />
+                            <AppNavigator />
+                        </WaiterCallProvider>
+                    </OrderProvider>
+                </RestaurantProvider>
+            </AuthProvider>
+        </SafeAreaProvider>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
 });
