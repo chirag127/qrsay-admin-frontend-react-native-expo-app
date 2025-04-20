@@ -44,6 +44,17 @@ cd qrsay/qrsay-admin-frontend-react-native-expo-app
 2. Install dependencies:
 
 ```bash
+# Use our robust installation script to avoid common issues
+npm run install-robust
+
+# On Windows, you can also run the batch file
+install.bat
+
+# On macOS/Linux, you can run the shell script (make it executable first)
+chmod +x install.sh
+./install.sh
+
+# Or use standard installation (may encounter issues)
 npm install
 # or
 yarn install
@@ -97,10 +108,68 @@ If you encounter any of these errors:
 -   `Unable to resolve "../../getReactNativeVersion" from "node_modules\react-native-gesture-handler\src\handlers\gestures\GestureDetector.tsx"`
 -   `Android Bundling failed` related to gesture handler imports
 -   `TypeError: Cannot read property 'install' of null` in GestureHandlerRootView
+-   `[react-native-gesture-handler] react-native-gesture-handler module was not found`
+-   `Unsupported top level event type "topInsetsChange" dispatched`
 
 Follow these steps:
 
-1. Run the comprehensive fix script:
+1. Use the fix-activity-indicator script to fix the size issue in ActivityIndicator:
+
+    ```bash
+    npm run fix-activity-indicator
+    ```
+
+    This script patches the ActivityIndicator component to handle string size values.
+
+2. Use the fix-screens-size-issue script to fix the size issue in react-native-screens:
+
+    ```bash
+    npm run fix-screens-size-issue
+    ```
+
+    This script patches the react-native-screens package to handle string size values.
+
+3. Use the fix-entry-point script to fix the entry point:
+
+    ```bash
+    npm run fix-entry-point
+    ```
+
+    This script creates a bootstrap.js file that applies all necessary patches before the app starts.
+
+4. Use the fix-naming-conflicts script to fix naming conflicts:
+
+    ```bash
+    npm run fix-naming-conflicts
+    ```
+
+    This script fixes naming conflicts in the mockGestureHandler.js file.
+
+5. Use the direct patch for react-native-gesture-handler:
+
+    ```bash
+    npm run patch-gesture-handler
+    ```
+
+    This script directly patches the react-native-gesture-handler module to work without the native module.
+
+6. Or use the fix-all script to apply all fixes at once:
+
+    ```bash
+    npm run fix-all
+    ```
+
+    This script applies all necessary fixes to the gesture handler and other components, including the direct patch.
+
+7. Or use the robust installation script:
+
+    ```bash
+    npm run install-robust
+    ```
+
+    This script handles common installation issues and applies all necessary fixes.
+
+8. If that doesn't work, run the comprehensive fix script:
 
     ```bash
     npm run fix-gesture-handler
@@ -108,13 +177,13 @@ Follow these steps:
 
     This script creates fallback implementations for all the missing modules and fixes import paths.
 
-2. If that doesn't work, run the clean install script:
+9. If that doesn't work, run the clean install script:
 
     ```bash
     npm run clean
     ```
 
-3. This will:
+10. This will:
 
     - Remove node_modules and other temporary directories
     - Clean the npm cache
@@ -123,13 +192,13 @@ Follow these steps:
     - Run the comprehensive fix-gesture-handler script
     - Create fallback implementations for all missing modules
 
-4. If the issue persists, try starting with a cleared cache:
+11. If the issue persists, try starting with a cleared cache:
 
     ```bash
     npm run reset
     ```
 
-5. The app includes a custom metro.config.js that provides fallback implementations for problematic modules. If you're still having issues, check that this file is properly configured.
+12. The app includes a custom metro.config.js that provides fallback implementations for problematic modules. If you're still having issues, check that this file is properly configured.
 
 ### Other Issues
 
