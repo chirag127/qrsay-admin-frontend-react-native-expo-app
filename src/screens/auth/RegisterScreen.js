@@ -6,32 +6,57 @@ import * as Yup from 'yup';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS, SIZES } from '../../constants';
 
-const LoginSchema = Yup.object().shape({
+const RegisterSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(2, 'Name is too short')
+    .required('Name is required'),
   email: Yup.string()
     .email('Invalid email')
     .required('Email is required'),
+  phoneNumber: Yup.string()
+    .matches(/^\d{10}$/, 'Phone number must be 10 digits')
+    .required('Phone number is required'),
   password: Yup.string()
     .min(8, 'Password must be at least 8 characters')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+    )
     .required('Password is required'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password'), null], 'Passwords must match')
+    .required('Confirm password is required'),
 });
 
-const LoginScreen = ({ navigation }) => {
-  const { login, error } = useAuth();
+const RegisterScreen = ({ navigation }) => {
+  const { register, error } = useAuth();
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [secureConfirmTextEntry, setSecureConfirmTextEntry] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
+      name: '',
       email: '',
+      phoneNumber: '',
       password: '',
+      confirmPassword: '',
     },
-    validationSchema: LoginSchema,
+    validationSchema: RegisterSchema,
     onSubmit: async (values) => {
       try {
         setLoading(true);
-        await login(values.email, values.password);
+        const userData = {
+          name: values.name,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          password: values.password,
+        };
+        
+        await register(userData);
+        navigation.navigate('Login');
       } catch (error) {
-        console.error('Login error:', error);
+        console.error('Registration error:', error);
       } finally {
         setLoading(false);
       }
@@ -40,6 +65,10 @@ const LoginScreen = ({ navigation }) => {
 
   const toggleSecureEntry = () => {
     setSecureTextEntry(!secureTextEntry);
+  };
+
+  const toggleSecureConfirmEntry = () => {
+    setSecureConfirmTextEntry(!secureConfirmTextEntry);
   };
 
   return (
@@ -54,10 +83,26 @@ const LoginScreen = ({ navigation }) => {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.title}>QRSay Admin</Text>
+          <Text style={styles.title}>Create Account</Text>
         </View>
 
         <View style={styles.formContainer}>
+          <TextInput
+            label="Full Name"
+            value={formik.values.name}
+            onChangeText={formik.handleChange('name')}
+            onBlur={formik.handleBlur('name')}
+            error={formik.touched.name && formik.errors.name}
+            style={styles.input}
+            mode="outlined"
+            outlineColor={COLORS.border}
+            activeOutlineColor={COLORS.primary}
+            left={<TextInput.Icon icon="account" color={COLORS.gray} />}
+          />
+          {formik.touched.name && formik.errors.name && (
+            <Text style={styles.errorText}>{formik.errors.name}</Text>
+          )}
+
           <TextInput
             label="Email"
             value={formik.values.email}
@@ -74,6 +119,23 @@ const LoginScreen = ({ navigation }) => {
           />
           {formik.touched.email && formik.errors.email && (
             <Text style={styles.errorText}>{formik.errors.email}</Text>
+          )}
+
+          <TextInput
+            label="Phone Number"
+            value={formik.values.phoneNumber}
+            onChangeText={formik.handleChange('phoneNumber')}
+            onBlur={formik.handleBlur('phoneNumber')}
+            error={formik.touched.phoneNumber && formik.errors.phoneNumber}
+            style={styles.input}
+            mode="outlined"
+            outlineColor={COLORS.border}
+            activeOutlineColor={COLORS.primary}
+            left={<TextInput.Icon icon="phone" color={COLORS.gray} />}
+            keyboardType="phone-pad"
+          />
+          {formik.touched.phoneNumber && formik.errors.phoneNumber && (
+            <Text style={styles.errorText}>{formik.errors.phoneNumber}</Text>
           )}
 
           <TextInput
@@ -100,14 +162,31 @@ const LoginScreen = ({ navigation }) => {
             <Text style={styles.errorText}>{formik.errors.password}</Text>
           )}
 
-          {error && <Text style={styles.errorText}>{error}</Text>}
+          <TextInput
+            label="Confirm Password"
+            value={formik.values.confirmPassword}
+            onChangeText={formik.handleChange('confirmPassword')}
+            onBlur={formik.handleBlur('confirmPassword')}
+            error={formik.touched.confirmPassword && formik.errors.confirmPassword}
+            style={styles.input}
+            mode="outlined"
+            outlineColor={COLORS.border}
+            activeOutlineColor={COLORS.primary}
+            secureTextEntry={secureConfirmTextEntry}
+            left={<TextInput.Icon icon="lock-check" color={COLORS.gray} />}
+            right={
+              <TextInput.Icon
+                icon={secureConfirmTextEntry ? 'eye' : 'eye-off'}
+                color={COLORS.gray}
+                onPress={toggleSecureConfirmEntry}
+              />
+            }
+          />
+          {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+            <Text style={styles.errorText}>{formik.errors.confirmPassword}</Text>
+          )}
 
-          <TouchableOpacity
-            style={styles.forgotPassword}
-            onPress={() => navigation.navigate('ForgotPassword')}
-          >
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
           <Button
             mode="contained"
@@ -118,13 +197,13 @@ const LoginScreen = ({ navigation }) => {
             disabled={loading}
             color={COLORS.primary}
           >
-            Login
+            Register
           </Button>
 
-          <View style={styles.registerContainer}>
-            <Text style={styles.registerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.registerLink}>Sign Up</Text>
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.loginLink}>Sign In</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -148,8 +227,8 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.extraLarge,
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
   },
   title: {
     fontSize: 24,
@@ -169,35 +248,27 @@ const styles = StyleSheet.create({
     fontSize: SIZES.small,
     marginBottom: SIZES.base,
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: SIZES.medium,
-  },
-  forgotPasswordText: {
-    color: COLORS.primary,
-    fontSize: SIZES.font,
-  },
   button: {
-    marginTop: SIZES.base,
+    marginTop: SIZES.medium,
     borderRadius: SIZES.base,
   },
   buttonContent: {
     height: 50,
   },
-  registerContainer: {
+  loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: SIZES.large,
   },
-  registerText: {
+  loginText: {
     color: COLORS.gray,
     fontSize: SIZES.font,
   },
-  registerLink: {
+  loginLink: {
     color: COLORS.primary,
     fontSize: SIZES.font,
     fontWeight: 'bold',
   },
 });
 
-export default LoginScreen;
+export default RegisterScreen;

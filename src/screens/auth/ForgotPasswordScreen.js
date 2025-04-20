@@ -1,64 +1,50 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  KeyboardAvoidingView, 
-  Platform,
-  ScrollView,
-  ActivityIndicator,
-  Alert
-} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import authService from '../../services/auth.service';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { TextInput, Button } from 'react-native-paper';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useAuth } from '../../context/AuthContext';
+import { COLORS, SIZES } from '../../constants';
+
+const ForgotPasswordSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email')
+    .required('Email is required'),
+});
 
 const ForgotPasswordScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const { forgotPassword, error } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      setEmailError('Email is required');
-      return false;
-    } else if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address');
-      return false;
-    }
-    setEmailError('');
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    if (validateEmail(email)) {
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+    },
+    validationSchema: ForgotPasswordSchema,
+    onSubmit: async (values) => {
       try {
-        setIsLoading(true);
-        const response = await authService.forgotPassword(email);
-        
-        if (response && response.status === 'success') {
-          setIsSuccess(true);
-        } else {
-          Alert.alert('Error', 'Failed to send password reset email. Please try again.');
-        }
+        setLoading(true);
+        await forgotPassword(values.email);
+        setSuccess(true);
+        Alert.alert(
+          'Password Reset Email Sent',
+          'Please check your email for instructions to reset your password.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('Login'),
+            },
+          ]
+        );
       } catch (error) {
         console.error('Forgot password error:', error);
-        Alert.alert(
-          'Error', 
-          error.response?.data?.message || 'An error occurred. Please try again.'
-        );
+        setSuccess(false);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
-    }
-  };
-
-  const handleBackToLogin = () => {
-    navigation.navigate('Login');
-  };
+    },
+  });
 
   return (
     <KeyboardAvoidingView
@@ -68,70 +54,68 @@ const ForgotPasswordScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={handleBackToLogin}
+          onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-left" size={20} color="#333" />
+          <Text style={styles.backButtonText}>← Back</Text>
         </TouchableOpacity>
-        
-        <View style={styles.formContainer}>
+
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={styles.title}>Forgot Password</Text>
-          
-          {isSuccess ? (
-            <View style={styles.successContainer}>
-              <Icon name="check-circle" size={60} color="#4CAF50" />
-              <Text style={styles.successText}>
-                Password reset email sent! Please check your email for instructions.
-              </Text>
-              <TouchableOpacity
-                style={styles.backToLoginButton}
-                onPress={handleBackToLogin}
-              >
-                <Text style={styles.backToLoginText}>Back to Login</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <>
-              <Text style={styles.subtitle}>
-                Enter your email address and we'll send you instructions to reset your password.
-              </Text>
-              
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Email</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your email"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  value={email}
-                  onChangeText={(text) => {
-                    setEmail(text);
-                    validateEmail(text);
-                  }}
-                />
-                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-              </View>
-              
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={handleSubmit}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.submitButtonText}>Send Reset Link</Text>
-                )}
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={handleBackToLogin}
-                disabled={isLoading}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </>
+          <Text style={styles.subtitle}>
+            Enter your email address and we'll send you instructions to reset your password.
+          </Text>
+        </View>
+
+        <View style={styles.formContainer}>
+          <TextInput
+            label="Email"
+            value={formik.values.email}
+            onChangeText={formik.handleChange('email')}
+            onBlur={formik.handleBlur('email')}
+            error={formik.touched.email && formik.errors.email}
+            style={styles.input}
+            mode="outlined"
+            outlineColor={COLORS.border}
+            activeOutlineColor={COLORS.primary}
+            left={<TextInput.Icon icon="email" color={COLORS.gray} />}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          {formik.touched.email && formik.errors.email && (
+            <Text style={styles.errorText}>{formik.errors.email}</Text>
           )}
+
+          {error && <Text style={styles.errorText}>{error}</Text>}
+
+          {success && (
+            <Text style={styles.successText}>
+              Password reset email sent. Please check your inbox.
+            </Text>
+          )}
+
+          <Button
+            mode="contained"
+            onPress={formik.handleSubmit}
+            style={styles.button}
+            contentStyle={styles.buttonContent}
+            loading={loading}
+            disabled={loading}
+            color={COLORS.primary}
+          >
+            Send Reset Link
+          </Button>
+
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Remember your password? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.loginLink}>Sign In</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -141,109 +125,80 @@ const ForgotPasswordScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.white,
   },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
+    justifyContent: 'center',
+    padding: SIZES.extraLarge,
   },
   backButton: {
-    marginBottom: 20,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: 'absolute',
+    top: SIZES.extraLarge,
+    left: SIZES.extraLarge,
   },
-  formContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  backButtonText: {
+    color: COLORS.primary,
+    fontSize: SIZES.medium,
+    fontWeight: 'bold',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: SIZES.extraLarge,
+  },
+  logo: {
+    width: 100,
+    height: 100,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    color: COLORS.primary,
+    marginTop: SIZES.base,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 5,
-    color: '#333',
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  submitButton: {
-    backgroundColor: '#ff6b00',
-    height: 50,
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  cancelButton: {
-    height: 50,
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontSize: 16,
-  },
-  successContainer: {
-    alignItems: 'center',
-    padding: 20,
-  },
-  successText: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: SIZES.font,
+    color: COLORS.gray,
     textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 30,
+    marginTop: SIZES.base,
+    marginHorizontal: SIZES.large,
   },
-  backToLoginButton: {
-    backgroundColor: '#ff6b00',
-    height: 50,
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+  formContainer: {
     width: '100%',
   },
-  backToLoginText: {
-    color: '#fff',
-    fontSize: 16,
+  input: {
+    marginBottom: SIZES.base,
+    backgroundColor: COLORS.white,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: SIZES.small,
+    marginBottom: SIZES.base,
+  },
+  successText: {
+    color: COLORS.success,
+    fontSize: SIZES.small,
+    marginBottom: SIZES.base,
+  },
+  button: {
+    marginTop: SIZES.medium,
+    borderRadius: SIZES.base,
+  },
+  buttonContent: {
+    height: 50,
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: SIZES.large,
+  },
+  loginText: {
+    color: COLORS.gray,
+    fontSize: SIZES.font,
+  },
+  loginLink: {
+    color: COLORS.primary,
+    fontSize: SIZES.font,
     fontWeight: 'bold',
   },
 });

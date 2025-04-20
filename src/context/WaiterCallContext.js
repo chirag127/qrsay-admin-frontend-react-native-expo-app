@@ -1,138 +1,157 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import waiterService from '../services/waiter.service';
-import socketService from '../services/socket.service';
-import { useRestaurant } from './RestaurantContext';
+import * as waiterCallService from '../services/waiterCallService';
+import socketService from '../services/socketService';
+import { useAuth } from './AuthContext';
+import { WAITER_CALL_STATUS } from '../constants';
 
-// Create the context
 const WaiterCallContext = createContext();
 
-// Create a provider component
 export const WaiterCallProvider = ({ children }) => {
-  const { restaurantData } = useRestaurant();
+  const { restaurant } = useAuth();
   const [waiterCalls, setWaiterCalls] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Load waiter calls when restaurant data is available
   useEffect(() => {
-    if (restaurantData && restaurantData._id) {
-      loadWaiterCalls();
+    if (restaurant && restaurant._id) {
+      // Initialize socket if not already initialized
+      const socket = socketService.initializeSocket();
       
-      // Setup socket listeners for waiter call updates
-      const socket = socketService.getSocket();
+      // Join restaurant room
+      socketService.joinRestaurantRoom(restaurant._id);
       
-      socket.on('new_waiter_call', (newCall) => {
-        console.log('New waiter call received:', newCall);
-        // Add the new call to the top of the list if it doesn't already exist
-        setWaiterCalls((prevCalls) => {
-          const exists = prevCalls.some((call) => call.callId === newCall.callId);
-          if (!exists) {
-            return [newCall, ...prevCalls];
-          }
-          return prevCalls;
-        });
+      // Listen for new waiter calls
+      socketService.listenForWaiterCalls((callData) => {
+        // Add the new call to the list
+        setWaiterCalls(prev => [callData, ...prev]);
       });
       
-      socket.on('waiter_call_status_updated', (updatedCall) => {
-        console.log('Waiter call status updated:', updatedCall);
-        // Update the call in the list
-        setWaiterCalls((prevCalls) => {
-          return prevCalls.map((call) => {
-            if (call.callId === updatedCall.callId) {
-              return { ...call, status: updatedCall.status };
-            }
-            return call;
-          });
-        });
+      // Listen for waiter call status updates
+      socketService.listenForWaiterCallStatusUpdates((statusData) => {
+        // Update the status of the call in the list
+        setWaiterCalls(prev => 
+          prev.map(call => 
+            call.callId === statusData.callId 
+              ? { ...call, status: statusData.status } 
+              : call
+          )
+        );
       });
       
-      // Clean up on unmount
+      // Load initial waiter calls
+      fetchWaiterCalls();
+      
+      // Cleanup on unmount
       return () => {
-        socket.off('new_waiter_call');
-        socket.off('waiter_call_status_updated');
+        // No need to disconnect here as it might affect other contexts
       };
     }
-  }, [restaurantData]);
+  }, [restaurant]);
 
-  // Load waiter calls
-  const loadWaiterCalls = async () => {
+  const fetchWaiterCalls = async () => {
     try {
-      setIsLoading(true);
-      const response = await waiterService.getWaiterCalls();
+      setLoading(true);
+      setError(null);
+      
+      const response = await waiterCallService.getWaiterCalls();
       
       if (response && response.data && response.data.waiterCalls) {
-        // Format the waiter calls to match the socket event format
-        const formattedCalls = response.data.waiterCalls.map((call) => ({
+        // Format the waiter calls data
+        const formattedCalls = response.data.waiterCalls.map(call => ({
           callId: call._id,
           restaurantId: call.restaurantId,
           tableId: call.tableId,
           tableName: call.tableName,
           customerName: call.customerName,
-          message: call.message,
+          message: call.message || 'No message',
           createdAt: new Date(call.createdAt).toLocaleString(),
           status: call.status,
-          rawDate: call.createdAt,
+          rawDate: new Date(call.createdAt),
         }));
+        
+        // Sort by date (newest first)
+        formattedCalls.sort((a, b) => b.rawDate - a.rawDate);
         
         setWaiterCalls(formattedCalls);
       }
-    } catch (error) {
-      console.error('Load waiter calls error:', error);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      console.error('Error fetching waiter calls:', err);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Acknowledge waiter call
-  const acknowledgeWaiterCall = async (callId) => {
+  const acknowledgeCall = async (callId) => {
     try {
-      setIsLoading(true);
-      await waiterService.updateWaiterCallStatus({ callId, status: 'acknowledged' });
+      setLoading(true);
+      setError(null);
       
-      // Update is handled by socket event
+      await waiterCallService.updateWaiterCallStatus(callId, WAITER_CALL_STATUS.ACKNOWLEDGED);
       
-      return { success: true };
-    } catch (error) {
-      console.error('Acknowledge waiter call error:', error);
-      return { success: false, message: 'An error occurred while acknowledging the waiter call' };
+      // Update the call status in the local state
+      setWaiterCalls(prev => 
+        prev.map(call => 
+          call.callId === callId 
+            ? { ...call, status: WAITER_CALL_STATUS.ACKNOWLEDGED } 
+            : call
+        )
+      );
+      
+      return true;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Resolve waiter call
-  const resolveWaiterCall = async (callId) => {
+  const resolveCall = async (callId) => {
     try {
-      setIsLoading(true);
-      await waiterService.updateWaiterCallStatus({ callId, status: 'resolved' });
+      setLoading(true);
+      setError(null);
       
-      // Update is handled by socket event
+      await waiterCallService.updateWaiterCallStatus(callId, WAITER_CALL_STATUS.RESOLVED);
       
-      return { success: true };
-    } catch (error) {
-      console.error('Resolve waiter call error:', error);
-      return { success: false, message: 'An error occurred while resolving the waiter call' };
+      // Update the call status in the local state
+      setWaiterCalls(prev => 
+        prev.map(call => 
+          call.callId === callId 
+            ? { ...call, status: WAITER_CALL_STATUS.RESOLVED } 
+            : call
+        )
+      );
+      
+      return true;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Context value
-  const value = {
-    waiterCalls,
-    isLoading,
-    loadWaiterCalls,
-    acknowledgeWaiterCall,
-    resolveWaiterCall,
-  };
-
-  return <WaiterCallContext.Provider value={value}>{children}</WaiterCallContext.Provider>;
+  return (
+    <WaiterCallContext.Provider
+      value={{
+        waiterCalls,
+        loading,
+        error,
+        fetchWaiterCalls,
+        acknowledgeCall,
+        resolveCall,
+      }}
+    >
+      {children}
+    </WaiterCallContext.Provider>
+  );
 };
 
-// Custom hook to use the waiter call context
-export const useWaiterCall = () => {
+export const useWaiterCalls = () => {
   const context = useContext(WaiterCallContext);
   if (!context) {
-    throw new Error('useWaiterCall must be used within a WaiterCallProvider');
+    throw new Error('useWaiterCalls must be used within a WaiterCallProvider');
   }
   return context;
 };

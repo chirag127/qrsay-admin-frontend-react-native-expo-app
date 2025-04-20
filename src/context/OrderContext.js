@@ -1,178 +1,165 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import orderService from '../services/order.service';
-import socketService from '../services/socket.service';
-import { useRestaurant } from './RestaurantContext';
+import * as orderService from '../services/orderService';
+import socketService from '../services/socketService';
+import { useAuth } from './AuthContext';
+import { ORDER_STATUS } from '../constants';
 
-// Create the context
 const OrderContext = createContext();
 
-// Create a provider component
 export const OrderProvider = ({ children }) => {
-  const { restaurantData } = useRestaurant();
+  const { restaurant } = useAuth();
   const [pendingOrders, setPendingOrders] = useState([]);
   const [processingOrders, setProcessingOrders] = useState([]);
   const [completedOrders, setCompletedOrders] = useState([]);
+  const [cancelledOrders, setCancelledOrders] = useState([]);
   const [activeDineIn, setActiveDineIn] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Load orders when restaurant data is available
   useEffect(() => {
-    if (restaurantData && restaurantData._id) {
-      loadOrders();
-      loadActiveDineIn();
+    if (restaurant && restaurant._id) {
+      // Initialize socket
+      const socket = socketService.initializeSocket();
       
-      // Setup socket listeners for order updates
-      const socket = socketService.getSocket();
+      // Join restaurant room
+      socketService.joinRestaurantRoom(restaurant._id);
       
-      socket.on('orderUpdate', (updatedOrder) => {
-        console.log('Order update received:', updatedOrder);
-        loadOrders();
+      // Listen for order updates
+      socketService.listenForOrderUpdates((orderData) => {
+        refreshOrders();
       });
       
-      // Clean up on unmount
+      // Load initial orders
+      refreshOrders();
+      
+      // Cleanup on unmount
       return () => {
-        socket.off('orderUpdate');
+        socketService.disconnectSocket();
       };
     }
-  }, [restaurantData]);
+  }, [restaurant]);
 
-  // Load orders
-  const loadOrders = async () => {
+  const refreshOrders = async () => {
     try {
-      setIsLoading(true);
-      
-      // Load pending orders
-      const pendingResponse = await orderService.getRestaurantOrdersByStatus({ orderStatus: 'pending' });
-      if (pendingResponse && pendingResponse.data && pendingResponse.data.orders) {
-        setPendingOrders(pendingResponse.data.orders);
-      }
-      
-      // Load processing orders
-      const processingResponse = await orderService.getRestaurantOrdersByStatus({ orderStatus: 'processing' });
-      if (processingResponse && processingResponse.data && processingResponse.data.orders) {
-        setProcessingOrders(processingResponse.data.orders);
-      }
-      
-      // Load completed orders
-      const completedResponse = await orderService.getRestaurantOrdersByStatus({ orderStatus: 'completed' });
-      if (completedResponse && completedResponse.data && completedResponse.data.orders) {
-        setCompletedOrders(completedResponse.data.orders);
-      }
-    } catch (error) {
-      console.error('Load orders error:', error);
+      setLoading(true);
+      await fetchOrdersByStatus(ORDER_STATUS.PENDING);
+      await fetchOrdersByStatus(ORDER_STATUS.PROCESSING);
+      await fetchOrdersByStatus(ORDER_STATUS.COMPLETED);
+      await fetchOrdersByStatus(ORDER_STATUS.CANCELLED);
+      await fetchActiveDineIn();
+    } catch (err) {
+      setError(err.message);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Load active dine-in
-  const loadActiveDineIn = async () => {
+  const fetchOrdersByStatus = async (status) => {
     try {
-      const response = await orderService.getActiveDineIn();
-      if (response && response.data && response.data.activeDineIn) {
-        setActiveDineIn(response.data.activeDineIn);
+      const response = await orderService.getOrdersByStatus(status);
+      
+      if (response && response.data && response.data.orders) {
+        const orders = response.data.orders;
+        
+        switch (status) {
+          case ORDER_STATUS.PENDING:
+            setPendingOrders(orders);
+            break;
+          case ORDER_STATUS.PROCESSING:
+            setProcessingOrders(orders);
+            break;
+          case ORDER_STATUS.COMPLETED:
+            setCompletedOrders(orders);
+            break;
+          case ORDER_STATUS.CANCELLED:
+            setCancelledOrders(orders);
+            break;
+          default:
+            break;
+        }
       }
-    } catch (error) {
-      console.error('Load active dine-in error:', error);
+    } catch (err) {
+      console.error(`Error fetching ${status} orders:`, err);
+      throw err;
     }
   };
 
-  // Accept order
-  const acceptOrder = async (orderId, data) => {
+  const fetchActiveDineIn = async () => {
     try {
-      setIsLoading(true);
-      await orderService.acceptOrder(orderId, data);
+      // This endpoint might be different in your API
+      const response = await orderService.getOrdersByStatus('dineIn');
       
-      // Emit socket event
-      if (restaurantData && restaurantData._id) {
-        socketService.emitEvent('orderAcceptedOrRejected', {
-          orderId,
-          orderStatus: 'processing',
-          restaurantId: restaurantData._id,
-          customerId: data.customerId,
-        });
+      if (response && response.data && response.data.orders) {
+        setActiveDineIn(response.data.orders);
       }
-      
-      // Reload orders
-      await loadOrders();
-      
-      return { success: true };
-    } catch (error) {
-      console.error('Accept order error:', error);
-      return { success: false, message: 'An error occurred while accepting the order' };
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      console.error('Error fetching active dine-in:', err);
+      throw err;
     }
   };
 
-  // Reject order
-  const rejectOrder = async (orderId, data) => {
+  const changeOrderStatus = async (orderId, status, reason = '') => {
     try {
-      setIsLoading(true);
-      await orderService.rejectOrder(orderId, data);
+      setLoading(true);
+      setError(null);
       
-      // Emit socket event
-      if (restaurantData && restaurantData._id) {
-        socketService.emitEvent('orderAcceptedOrRejected', {
-          orderId,
-          orderStatus: 'rejected',
-          restaurantId: restaurantData._id,
-          customerId: data.customerId,
-        });
-      }
+      await orderService.changeOrderStatus(orderId, status, reason);
       
-      // Reload orders
-      await loadOrders();
+      // Refresh orders after status change
+      await refreshOrders();
       
-      return { success: true };
-    } catch (error) {
-      console.error('Reject order error:', error);
-      return { success: false, message: 'An error occurred while rejecting the order' };
+      return true;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Complete order
-  const completeOrder = async (orderId) => {
+  const deleteOrder = async (orderId) => {
     try {
-      setIsLoading(true);
-      await orderService.completeOrder(orderId);
+      setLoading(true);
+      setError(null);
       
-      // Reload orders
-      await loadOrders();
+      await orderService.deleteOrder(orderId);
       
-      return { success: true };
-    } catch (error) {
-      console.error('Complete order error:', error);
-      return { success: false, message: 'An error occurred while completing the order' };
+      // Refresh orders after deletion
+      await refreshOrders();
+      
+      return true;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Context value
-  const value = {
-    pendingOrders,
-    processingOrders,
-    completedOrders,
-    activeDineIn,
-    isLoading,
-    loadOrders,
-    loadActiveDineIn,
-    acceptOrder,
-    rejectOrder,
-    completeOrder,
-  };
-
-  return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
+  return (
+    <OrderContext.Provider
+      value={{
+        pendingOrders,
+        processingOrders,
+        completedOrders,
+        cancelledOrders,
+        activeDineIn,
+        loading,
+        error,
+        refreshOrders,
+        changeOrderStatus,
+        deleteOrder,
+      }}
+    >
+      {children}
+    </OrderContext.Provider>
+  );
 };
 
-// Custom hook to use the order context
-export const useOrder = () => {
+export const useOrders = () => {
   const context = useContext(OrderContext);
   if (!context) {
-    throw new Error('useOrder must be used within an OrderProvider');
+    throw new Error('useOrders must be used within an OrderProvider');
   }
   return context;
 };

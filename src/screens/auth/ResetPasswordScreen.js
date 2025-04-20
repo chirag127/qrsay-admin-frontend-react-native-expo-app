@@ -1,85 +1,70 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  KeyboardAvoidingView, 
-  Platform,
-  ScrollView,
-  ActivityIndicator,
-  Alert
-} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import authService from '../../services/auth.service';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { TextInput, Button } from 'react-native-paper';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useAuth } from '../../context/AuthContext';
+import { COLORS, SIZES } from '../../constants';
+
+const ResetPasswordSchema = Yup.object().shape({
+  token: Yup.string()
+    .required('Reset token is required'),
+  password: Yup.string()
+    .min(8, 'Password must be at least 8 characters')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+    )
+    .required('Password is required'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password'), null], 'Passwords must match')
+    .required('Confirm password is required'),
+});
 
 const ResetPasswordScreen = ({ navigation, route }) => {
-  const { token } = route.params || {};
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const { resetPassword, error } = useAuth();
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [secureConfirmTextEntry, setSecureConfirmTextEntry] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const validatePassword = (password) => {
-    if (!password) {
-      setPasswordError('Password is required');
-      return false;
-    } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-      return false;
-    }
-    setPasswordError('');
-    return true;
-  };
+  // Get token from route params if available
+  const initialToken = route.params?.token || '';
 
-  const validateConfirmPassword = (confirmPassword) => {
-    if (!confirmPassword) {
-      setConfirmPasswordError('Confirm password is required');
-      return false;
-    } else if (confirmPassword !== password) {
-      setConfirmPasswordError('Passwords do not match');
-      return false;
-    }
-    setConfirmPasswordError('');
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    const isPasswordValid = validatePassword(password);
-    const isConfirmPasswordValid = validateConfirmPassword(confirmPassword);
-
-    if (isPasswordValid && isConfirmPasswordValid) {
-      if (!token) {
-        Alert.alert('Error', 'Reset token is missing. Please try again.');
-        return;
-      }
-
+  const formik = useFormik({
+    initialValues: {
+      token: initialToken,
+      password: '',
+      confirmPassword: '',
+    },
+    validationSchema: ResetPasswordSchema,
+    onSubmit: async (values) => {
       try {
-        setIsLoading(true);
-        const response = await authService.resetPassword(password, token);
-        
-        if (response && response.status === 'success') {
-          setIsSuccess(true);
-        } else {
-          Alert.alert('Error', 'Failed to reset password. Please try again.');
-        }
+        setLoading(true);
+        await resetPassword(values.password, values.token);
+        Alert.alert(
+          'Password Reset Successful',
+          'Your password has been reset successfully. Please login with your new password.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('Login'),
+            },
+          ]
+        );
       } catch (error) {
         console.error('Reset password error:', error);
-        Alert.alert(
-          'Error', 
-          error.response?.data?.message || 'An error occurred. Please try again.'
-        );
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
-    }
+    },
+  });
+
+  const toggleSecureEntry = () => {
+    setSecureTextEntry(!secureTextEntry);
   };
 
-  const handleBackToLogin = () => {
-    navigation.navigate('Login');
+  const toggleSecureConfirmEntry = () => {
+    setSecureConfirmTextEntry(!secureConfirmTextEntry);
   };
 
   return (
@@ -90,84 +75,109 @@ const ResetPasswordScreen = ({ navigation, route }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={handleBackToLogin}
+          onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-left" size={20} color="#333" />
+          <Text style={styles.backButtonText}>← Back</Text>
         </TouchableOpacity>
-        
-        <View style={styles.formContainer}>
+
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={styles.title}>Reset Password</Text>
-          
-          {isSuccess ? (
-            <View style={styles.successContainer}>
-              <Icon name="check-circle" size={60} color="#4CAF50" />
-              <Text style={styles.successText}>
-                Your password has been reset successfully!
-              </Text>
-              <TouchableOpacity
-                style={styles.backToLoginButton}
-                onPress={handleBackToLogin}
-              >
-                <Text style={styles.backToLoginText}>Back to Login</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <>
-              <Text style={styles.subtitle}>
-                Enter your new password below.
-              </Text>
-              
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>New Password</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter new password"
-                  secureTextEntry
-                  value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    validatePassword(text);
-                  }}
-                />
-                {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-              </View>
-              
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Confirm Password</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Confirm new password"
-                  secureTextEntry
-                  value={confirmPassword}
-                  onChangeText={(text) => {
-                    setConfirmPassword(text);
-                    validateConfirmPassword(text);
-                  }}
-                />
-                {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
-              </View>
-              
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={handleSubmit}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.submitButtonText}>Reset Password</Text>
-                )}
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={handleBackToLogin}
-                disabled={isLoading}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </>
+          <Text style={styles.subtitle}>
+            Enter your reset token and create a new password for your account.
+          </Text>
+        </View>
+
+        <View style={styles.formContainer}>
+          <TextInput
+            label="Reset Token"
+            value={formik.values.token}
+            onChangeText={formik.handleChange('token')}
+            onBlur={formik.handleBlur('token')}
+            error={formik.touched.token && formik.errors.token}
+            style={styles.input}
+            mode="outlined"
+            outlineColor={COLORS.border}
+            activeOutlineColor={COLORS.primary}
+            left={<TextInput.Icon icon="key" color={COLORS.gray} />}
+            autoCapitalize="none"
+          />
+          {formik.touched.token && formik.errors.token && (
+            <Text style={styles.errorText}>{formik.errors.token}</Text>
           )}
+
+          <TextInput
+            label="New Password"
+            value={formik.values.password}
+            onChangeText={formik.handleChange('password')}
+            onBlur={formik.handleBlur('password')}
+            error={formik.touched.password && formik.errors.password}
+            style={styles.input}
+            mode="outlined"
+            outlineColor={COLORS.border}
+            activeOutlineColor={COLORS.primary}
+            secureTextEntry={secureTextEntry}
+            left={<TextInput.Icon icon="lock" color={COLORS.gray} />}
+            right={
+              <TextInput.Icon
+                icon={secureTextEntry ? 'eye' : 'eye-off'}
+                color={COLORS.gray}
+                onPress={toggleSecureEntry}
+              />
+            }
+          />
+          {formik.touched.password && formik.errors.password && (
+            <Text style={styles.errorText}>{formik.errors.password}</Text>
+          )}
+
+          <TextInput
+            label="Confirm New Password"
+            value={formik.values.confirmPassword}
+            onChangeText={formik.handleChange('confirmPassword')}
+            onBlur={formik.handleBlur('confirmPassword')}
+            error={formik.touched.confirmPassword && formik.errors.confirmPassword}
+            style={styles.input}
+            mode="outlined"
+            outlineColor={COLORS.border}
+            activeOutlineColor={COLORS.primary}
+            secureTextEntry={secureConfirmTextEntry}
+            left={<TextInput.Icon icon="lock-check" color={COLORS.gray} />}
+            right={
+              <TextInput.Icon
+                icon={secureConfirmTextEntry ? 'eye' : 'eye-off'}
+                color={COLORS.gray}
+                onPress={toggleSecureConfirmEntry}
+              />
+            }
+          />
+          {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+            <Text style={styles.errorText}>{formik.errors.confirmPassword}</Text>
+          )}
+
+          {error && <Text style={styles.errorText}>{error}</Text>}
+
+          <Button
+            mode="contained"
+            onPress={formik.handleSubmit}
+            style={styles.button}
+            contentStyle={styles.buttonContent}
+            loading={loading}
+            disabled={loading}
+            color={COLORS.primary}
+          >
+            Reset Password
+          </Button>
+
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Remember your password? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.loginLink}>Sign In</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -177,109 +187,75 @@ const ResetPasswordScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.white,
   },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
+    justifyContent: 'center',
+    padding: SIZES.extraLarge,
   },
   backButton: {
-    marginBottom: 20,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: 'absolute',
+    top: SIZES.extraLarge,
+    left: SIZES.extraLarge,
   },
-  formContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  backButtonText: {
+    color: COLORS.primary,
+    fontSize: SIZES.medium,
+    fontWeight: 'bold',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: SIZES.extraLarge,
+  },
+  logo: {
+    width: 100,
+    height: 100,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    color: COLORS.primary,
+    marginTop: SIZES.base,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 5,
-    color: '#333',
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  submitButton: {
-    backgroundColor: '#ff6b00',
-    height: 50,
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  cancelButton: {
-    height: 50,
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontSize: 16,
-  },
-  successContainer: {
-    alignItems: 'center',
-    padding: 20,
-  },
-  successText: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: SIZES.font,
+    color: COLORS.gray,
     textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 30,
+    marginTop: SIZES.base,
+    marginHorizontal: SIZES.large,
   },
-  backToLoginButton: {
-    backgroundColor: '#ff6b00',
-    height: 50,
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+  formContainer: {
     width: '100%',
   },
-  backToLoginText: {
-    color: '#fff',
-    fontSize: 16,
+  input: {
+    marginBottom: SIZES.base,
+    backgroundColor: COLORS.white,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: SIZES.small,
+    marginBottom: SIZES.base,
+  },
+  button: {
+    marginTop: SIZES.medium,
+    borderRadius: SIZES.base,
+  },
+  buttonContent: {
+    height: 50,
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: SIZES.large,
+  },
+  loginText: {
+    color: COLORS.gray,
+    fontSize: SIZES.font,
+  },
+  loginLink: {
+    color: COLORS.primary,
+    fontSize: SIZES.font,
     fontWeight: 'bold',
   },
 });

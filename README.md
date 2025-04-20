@@ -1,287 +1,50 @@
-# QRSay Admin Mobile App
+# Welcome to your Expo app 👋
 
-A React Native Expo mobile application for QRSay restaurant management system. This app provides restaurant owners and staff with a mobile interface to manage orders, dishes, tables, and other restaurant operations.
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Features
+## Get started
 
--   **Authentication**: Secure login and user management
--   **Dashboard**: Overview of restaurant status, orders, and waiter calls
--   **Order Management**: View, accept, and manage customer orders
--   **Menu Management**: Add, edit, and manage dishes, categories, and options
--   **Restaurant Profile**: Manage restaurant details, gallery, and settings
--   **Table Management**: Manage restaurant tables and rooms
--   **Waiter Call System**: Receive and respond to customer waiter calls
--   **User Management**: Manage staff accounts and permissions
--   **Customer Management**: View customer information and order history
+1. Install dependencies
 
-## Technologies Used
+   ```bash
+   npm install
+   ```
 
--   React Native
--   Expo
--   React Navigation
--   Socket.io for real-time communication
--   Axios for API requests
--   AsyncStorage for local storage
--   React Native Elements for UI components
+2. Start the app
 
-## Getting Started
+   ```bash
+    npx expo start
+   ```
 
-### Prerequisites
+In the output, you'll find options to open the app in a
 
--   Node.js (v18 or later)
--   npm or yarn
--   Expo CLI (v50 or later)
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-### Installation
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-1. Clone the repository:
+## Get a fresh project
+
+When you're ready, run:
 
 ```bash
-git clone https://github.com/chirag127/qrsay.git
-cd qrsay/qrsay-admin-frontend-react-native-expo-app
+npm run reset-project
 ```
 
-2. Install dependencies:
+This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-```bash
-# Use our robust installation script to avoid common issues
-npm run install-robust
+## Learn more
 
-# On Windows, you can also run the batch file
-install.bat
+To learn more about developing your project with Expo, look at the following resources:
 
-# On macOS/Linux, you can run the shell script (make it executable first)
-chmod +x install.sh
-./install.sh
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-# Or use standard installation (may encounter issues)
-npm install
-# or
-yarn install
-```
+## Join the community
 
-3. Start the development server:
+Join our community of developers creating universal apps.
 
-```bash
-npm start
-# or
-yarn start
-```
-
-4. Open the app on your device using the Expo Go app or run on an emulator.
-
-## Environment Configuration
-
-The app uses different environment configurations for development, staging, and production. You can modify these settings in `src/config/environment.js`.
-
-## Project Structure
-
-```
-qrsay-admin-frontend-react-native-expo-app/
-├── assets/                  # Static assets like images and fonts
-├── src/
-│   ├── components/          # Reusable UI components
-│   ├── config/              # Configuration files
-│   ├── context/             # React context providers
-│   ├── hooks/               # Custom React hooks
-│   ├── navigation/          # Navigation configuration
-│   ├── screens/             # Screen components
-│   ├── services/            # API services
-│   └── utils/               # Utility functions
-├── App.js                   # Main app component
-├── app.json                 # Expo configuration
-├── babel.config.js          # Babel configuration
-└── package.json             # Project dependencies
-```
-
-## Backend API
-
-This app connects to the QRSay backend API. Make sure the backend server is running and accessible.
-
-## Troubleshooting
-
-### Gesture Handler Import Errors
-
-If you encounter any of these errors:
-
--   `Unable to resolve "../handlersRegistry" from "node_modules\react-native-gesture-handler\src\handlers\gestures\GestureDetector.tsx"`
--   `Unable to resolve "../../getReactNativeVersion" from "node_modules\react-native-gesture-handler\src\handlers\gestures\GestureDetector.tsx"`
--   `Android Bundling failed` related to gesture handler imports
--   `TypeError: Cannot read property 'install' of null` in GestureHandlerRootView
--   `[react-native-gesture-handler] react-native-gesture-handler module was not found`
--   `Unsupported top level event type "topInsetsChange" dispatched`
-
-Follow these steps:
-
-1. Use the run-with-fixes script to apply all fixes and start the app:
-
-    ```bash
-    npm run run-with-fixes
-    ```
-
-    This script applies all fixes and starts the app. It:
-
-    - Runs the fix-all script to apply all patches
-    - Runs the fix-rns-screen script to patch the RNSScreen component
-    - Runs the fix-avatar script to patch the Avatar component
-    - Updates all ActivityIndicator components with size="large" to use numeric values
-    - Starts the app
-
-    Alternatively, you can run the individual fix scripts:
-
-2. Use the fix-activity-indicator script to fix the size issue in ActivityIndicator:
-
-    ```bash
-    npm run fix-activity-indicator
-    ```
-
-    This script patches the ActivityIndicator component to handle string size values.
-
-3. Use the fix-screens-size-issue script to fix the size issue in react-native-screens:
-
-    ```bash
-    npm run fix-screens-size-issue
-    ```
-
-    This script patches the react-native-screens package to handle string size values.
-
-4. Use the fix-rns-screen script to fix the size issue in RNSScreen:
-
-    ```bash
-    npm run fix-rns-screen
-    ```
-
-    This script patches the RNSScreen component to handle string size values.
-
-5. Use the fix-avatar script to fix the size issue in Avatar:
-
-    ```bash
-    npm run fix-avatar
-    ```
-
-    This script patches the Avatar component to handle string size values.
-
-6. Use the fix-entry-point script to fix the entry point:
-
-    ```bash
-    npm run fix-entry-point
-    ```
-
-    This script creates a bootstrap.js file that applies all necessary patches before the app starts.
-
-7. Use the fix-naming-conflicts script to fix naming conflicts:
-
-    ```bash
-    npm run fix-naming-conflicts
-    ```
-
-    This script fixes naming conflicts in the mockGestureHandler.js file.
-
-8. Use the direct patch for react-native-gesture-handler:
-
-    ```bash
-    npm run patch-gesture-handler
-    ```
-
-    This script directly patches the react-native-gesture-handler module to work without the native module.
-
-9. Or use the fix-all script to apply all fixes at once:
-
-    ```bash
-    npm run fix-all
-    ```
-
-    This script applies all necessary fixes to the gesture handler and other components, including the direct patch.
-
-10. Or use the robust installation script:
-
-    ```bash
-    npm run install-robust
-    ```
-
-    This script handles common installation issues and applies all necessary fixes.
-
-11. If that doesn't work, run the comprehensive fix script:
-
-    ```bash
-    npm run fix-gesture-handler
-    ```
-
-    This script creates fallback implementations for all the missing modules and fixes import paths.
-
-12. If that doesn't work, run the clean install script:
-
-    ```bash
-    npm run clean
-    ```
-
-13. This will:
-
-    - Remove node_modules and other temporary directories
-    - Clean the npm cache
-    - Reinstall dependencies
-    - Apply patches to fix gesture handler issues
-    - Run the comprehensive fix-gesture-handler script
-    - Create fallback implementations for all missing modules
-
-14. If the issue persists, try starting with a cleared cache:
-
-    ```bash
-    npm run reset
-    ```
-
-15. The app includes a custom metro.config.js that provides fallback implementations for problematic modules. If you're still having issues, check that this file is properly configured.
-
-### Other Issues
-
-If you encounter other issues:
-
-1. Make sure you have the latest version of Expo CLI:
-
-    ```bash
-    npm install -g expo-cli
-    ```
-
-2. Check that your Node.js version is compatible with Expo SDK 52:
-
-    ```bash
-    node -v
-    ```
-
-    (Node.js 18.x or later is recommended)
-
-3. Try clearing the Metro bundler cache:
-
-    ```bash
-    expo start --clear
-    ```
-
-4. If all else fails, try a complete project reset:
-
-    ```bash
-    npm run reset-project
-    ```
-
-    This will perform a more thorough cleanup than the clean script, including:
-
-    - Removing all generated directories (node_modules, .expo, android, ios)
-    - Cleaning all caches (npm, Metro bundler, Expo)
-    - Reinstalling all dependencies
-    - Applying all fixes
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
--   QRSay Team
--   All contributors to the project
+- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

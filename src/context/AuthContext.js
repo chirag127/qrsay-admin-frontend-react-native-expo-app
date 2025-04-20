@@ -1,101 +1,250 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import authService from '../services/auth.service';
+import * as authService from '../services/authService';
+import * as restaurantService from '../services/restaurantService';
 
-// Create the context
 const AuthContext = createContext();
 
-// Create a provider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [restaurant, setRestaurant] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Load user data from AsyncStorage on app start
   useEffect(() => {
+    // Check if user is logged in
     const loadUserData = async () => {
       try {
-        const userDetail = await authService.getUserDetail();
-        if (userDetail) {
-          setUser(userDetail);
-          setIsAuthenticated(true);
+        setLoading(true);
+        const userData = await authService.getCurrentUser();
+        
+        if (userData) {
+          setUser(userData);
+          
+          // Load restaurant data
+          try {
+            const restaurantData = await restaurantService.getRestaurantDetail();
+            if (restaurantData && restaurantData.data && restaurantData.data.restaurantDetail) {
+              setRestaurant(restaurantData.data.restaurantDetail);
+            }
+          } catch (restaurantError) {
+            console.error('Error loading restaurant data:', restaurantError);
+          }
         }
-      } catch (error) {
-        console.error('Error loading user data:', error);
+      } catch (err) {
+        setError(err.message);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     loadUserData();
   }, []);
 
-  // Login function
   const login = async (email, password) => {
     try {
-      setIsLoading(true);
-      const response = await authService.login(email, password);
+      setLoading(true);
+      setError(null);
       
-      if (response && response.user) {
-        setUser(response.user);
-        setIsAuthenticated(true);
-        return { success: true, data: response };
+      const data = await authService.login(email, password);
+      
+      if (data && data.user) {
+        setUser(data.user);
+        
+        // Load restaurant data
+        try {
+          const restaurantData = await restaurantService.getRestaurantDetail();
+          if (restaurantData && restaurantData.data && restaurantData.data.restaurantDetail) {
+            setRestaurant(restaurantData.data.restaurantDetail);
+          }
+        } catch (restaurantError) {
+          console.error('Error loading restaurant data:', restaurantError);
+        }
+        
+        return data.user;
       }
-      
-      return { success: false, message: 'Invalid credentials' };
-    } catch (error) {
-      console.error('Login error:', error);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'An error occurred during login' 
-      };
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Logout function
+  const register = async (userData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await authService.register(userData);
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       await authService.logout();
       setUser(null);
-      setIsAuthenticated(false);
-      return { success: true };
-    } catch (error) {
-      console.error('Logout error:', error);
-      return { success: false, message: 'An error occurred during logout' };
+      setRestaurant(null);
+    } catch (err) {
+      setError(err.message);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Update user data
-  const updateUserData = async (userData) => {
+  const forgotPassword = async (email) => {
     try {
-      setUser(userData);
-      await authService.setUserDetail(userData);
-      return { success: true };
-    } catch (error) {
-      console.error('Update user data error:', error);
-      return { success: false, message: 'An error occurred while updating user data' };
+      setLoading(true);
+      setError(null);
+      
+      const data = await authService.forgotPassword(email);
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Context value
-  const value = {
-    user,
-    isLoading,
-    isAuthenticated,
-    login,
-    logout,
-    updateUserData,
+  const resetPassword = async (password, token) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await authService.resetPassword(password, token);
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await authService.changePassword(currentPassword, newPassword);
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateRestaurantData = async (restaurantData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await restaurantService.updateRestaurantDetail(restaurantData);
+      
+      // Refresh restaurant data
+      const updatedRestaurantData = await restaurantService.getRestaurantDetail();
+      if (updatedRestaurantData && updatedRestaurantData.data && updatedRestaurantData.data.restaurantDetail) {
+        setRestaurant(updatedRestaurantData.data.restaurantDetail);
+      }
+      
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const changeRestaurantStatus = async (status) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await restaurantService.changeRestaurantStatus(status);
+      
+      // Update restaurant status in state
+      setRestaurant(prev => ({
+        ...prev,
+        restaurantStatus: status
+      }));
+      
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleDineInStatus = async (isDineInAvailable) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await restaurantService.toggleDineInStatus(isDineInAvailable);
+      
+      // Update dine-in status in state
+      setRestaurant(prev => ({
+        ...prev,
+        isDineInAvailableRestaurant: isDineInAvailable
+      }));
+      
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshRestaurantData = async () => {
+    try {
+      const restaurantData = await restaurantService.getRestaurantDetail();
+      if (restaurantData && restaurantData.data && restaurantData.data.restaurantDetail) {
+        setRestaurant(restaurantData.data.restaurantDetail);
+      }
+    } catch (err) {
+      console.error('Error refreshing restaurant data:', err);
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        restaurant,
+        loading,
+        error,
+        login,
+        register,
+        logout,
+        forgotPassword,
+        resetPassword,
+        changePassword,
+        updateRestaurantData,
+        changeRestaurantStatus,
+        toggleDineInStatus,
+        refreshRestaurantData,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-// Custom hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
