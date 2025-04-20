@@ -1,50 +1,102 @@
-# Welcome to your Expo app 👋
+# QRSay Admin Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native Expo mobile application for QRSay restaurant management system. This app provides restaurant owners and staff with a mobile interface to manage orders, dishes, customers, and more.
 
-## Get started
+## Features
 
-1. Install dependencies
+-   **Authentication**: Secure login, registration, and password reset
+-   **Dashboard**: Overview of restaurant performance and current orders
+-   **Order Management**: View, accept, process, and complete orders
+-   **Menu Management**: Add, edit, and delete dishes and categories
+-   **Waiter Call System**: Manage waiter calls from customers
+-   **User Management**: Manage staff accounts and permissions
+-   **Restaurant Profile**: Update restaurant information and settings
+-   **Real-time Updates**: Get instant notifications for new orders and waiter calls
 
-   ```bash
-   npm install
-   ```
+## Prerequisites
 
-2. Start the app
+-   Node.js (v14 or later)
+-   npm or yarn
+-   Expo CLI
 
-   ```bash
-    npx expo start
-   ```
+## Installation
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+1. Clone the repository:
 
 ```bash
-npm run reset-project
+git clone https://github.com/yourusername/qrsay-admin-frontend-react-native-expo-app.git
+cd qrsay-admin-frontend-react-native-expo-app
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Install dependencies:
 
-## Learn more
+```bash
+npm install
+# or
+yarn install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+3. Start the development server:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm start
+# or
+yarn start
+```
 
-## Join the community
+4. Run on a device or emulator:
+    - Scan the QR code with the Expo Go app on your mobile device
+    - Press 'a' to run on an Android emulator
+    - Press 'i' to run on an iOS simulator (requires macOS)
 
-Join our community of developers creating universal apps.
+## Environment Configuration
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Create a `.env` file in the root directory with the following variables:
+
+```
+API_URL=http://your-backend-url.com/api
+SOCKET_URL=http://your-backend-url.com
+```
+
+## Project Structure
+
+```
+qrsay-admin-frontend-react-native-expo-app/
+├── src/
+│   ├── assets/           # Images, fonts, and other static files
+│   ├── components/       # Reusable UI components
+│   ├── constants/        # App constants and theme
+│   ├── context/          # React context providers
+│   ├── hooks/            # Custom React hooks
+│   ├── navigation/       # Navigation configuration
+│   ├── screens/          # App screens
+│   ├── services/         # API services
+│   └── utils/            # Utility functions
+├── App.js                # Main app component
+├── app.json              # Expo configuration
+└── package.json          # Dependencies and scripts
+```
+
+## Backend Integration
+
+This app is designed to work with the QRSay backend API. Make sure the backend server is running and accessible from your device or emulator.
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+-   QRSay Team
+-   Expo
+-   React Native
+-   React Navigation
+-   React Native Paper
