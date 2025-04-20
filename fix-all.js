@@ -438,6 +438,22 @@ try {
     console.error("Error running fix-activity-indicator:", error);
 }
 
+// Fix RNSScreen size issue
+try {
+    console.log("Running fix for RNSScreen size issue...");
+    require("./fix-rns-screen");
+} catch (error) {
+    console.error("Error running fix-rns-screen:", error);
+}
+
+// Fix Avatar size issue
+try {
+    console.log("Running fix for Avatar size issue...");
+    require("./fix-avatar");
+} catch (error) {
+    console.error("Error running fix-avatar:", error);
+}
+
 console.log("All fixes applied successfully!");
 console.log("");
 console.log("Next steps:");

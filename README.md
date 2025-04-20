@@ -113,7 +113,23 @@ If you encounter any of these errors:
 
 Follow these steps:
 
-1. Use the fix-activity-indicator script to fix the size issue in ActivityIndicator:
+1. Use the run-with-fixes script to apply all fixes and start the app:
+
+    ```bash
+    npm run run-with-fixes
+    ```
+
+    This script applies all fixes and starts the app. It:
+
+    - Runs the fix-all script to apply all patches
+    - Runs the fix-rns-screen script to patch the RNSScreen component
+    - Runs the fix-avatar script to patch the Avatar component
+    - Updates all ActivityIndicator components with size="large" to use numeric values
+    - Starts the app
+
+    Alternatively, you can run the individual fix scripts:
+
+2. Use the fix-activity-indicator script to fix the size issue in ActivityIndicator:
 
     ```bash
     npm run fix-activity-indicator
@@ -121,7 +137,7 @@ Follow these steps:
 
     This script patches the ActivityIndicator component to handle string size values.
 
-2. Use the fix-screens-size-issue script to fix the size issue in react-native-screens:
+3. Use the fix-screens-size-issue script to fix the size issue in react-native-screens:
 
     ```bash
     npm run fix-screens-size-issue
@@ -129,7 +145,23 @@ Follow these steps:
 
     This script patches the react-native-screens package to handle string size values.
 
-3. Use the fix-entry-point script to fix the entry point:
+4. Use the fix-rns-screen script to fix the size issue in RNSScreen:
+
+    ```bash
+    npm run fix-rns-screen
+    ```
+
+    This script patches the RNSScreen component to handle string size values.
+
+5. Use the fix-avatar script to fix the size issue in Avatar:
+
+    ```bash
+    npm run fix-avatar
+    ```
+
+    This script patches the Avatar component to handle string size values.
+
+6. Use the fix-entry-point script to fix the entry point:
 
     ```bash
     npm run fix-entry-point
@@ -137,7 +169,7 @@ Follow these steps:
 
     This script creates a bootstrap.js file that applies all necessary patches before the app starts.
 
-4. Use the fix-naming-conflicts script to fix naming conflicts:
+7. Use the fix-naming-conflicts script to fix naming conflicts:
 
     ```bash
     npm run fix-naming-conflicts
@@ -145,7 +177,7 @@ Follow these steps:
 
     This script fixes naming conflicts in the mockGestureHandler.js file.
 
-5. Use the direct patch for react-native-gesture-handler:
+8. Use the direct patch for react-native-gesture-handler:
 
     ```bash
     npm run patch-gesture-handler
@@ -153,7 +185,7 @@ Follow these steps:
 
     This script directly patches the react-native-gesture-handler module to work without the native module.
 
-6. Or use the fix-all script to apply all fixes at once:
+9. Or use the fix-all script to apply all fixes at once:
 
     ```bash
     npm run fix-all
@@ -161,7 +193,7 @@ Follow these steps:
 
     This script applies all necessary fixes to the gesture handler and other components, including the direct patch.
 
-7. Or use the robust installation script:
+10. Or use the robust installation script:
 
     ```bash
     npm run install-robust
@@ -169,7 +201,7 @@ Follow these steps:
 
     This script handles common installation issues and applies all necessary fixes.
 
-8. If that doesn't work, run the comprehensive fix script:
+11. If that doesn't work, run the comprehensive fix script:
 
     ```bash
     npm run fix-gesture-handler
@@ -177,13 +209,13 @@ Follow these steps:
 
     This script creates fallback implementations for all the missing modules and fixes import paths.
 
-9. If that doesn't work, run the clean install script:
+12. If that doesn't work, run the clean install script:
 
     ```bash
     npm run clean
     ```
 
-10. This will:
+13. This will:
 
     - Remove node_modules and other temporary directories
     - Clean the npm cache
@@ -192,13 +224,13 @@ Follow these steps:
     - Run the comprehensive fix-gesture-handler script
     - Create fallback implementations for all missing modules
 
-11. If the issue persists, try starting with a cleared cache:
+14. If the issue persists, try starting with a cleared cache:
 
     ```bash
     npm run reset
     ```
 
-12. The app includes a custom metro.config.js that provides fallback implementations for problematic modules. If you're still having issues, check that this file is properly configured.
+15. The app includes a custom metro.config.js that provides fallback implementations for problematic modules. If you're still having issues, check that this file is properly configured.
 
 ### Other Issues
 

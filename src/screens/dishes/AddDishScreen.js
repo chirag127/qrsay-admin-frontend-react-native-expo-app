@@ -193,7 +193,7 @@ const AddDishScreen = () => {
     return (
       <View style={styles.container}>
         <Header title="Add Dish" showBackButton />
-        <ActivityIndicator size="large" color="#ff6b00" style={styles.loader} />
+        <ActivityIndicator size={50} color="#ff6b00" style={styles.loader} />
       </View>
     );
   }

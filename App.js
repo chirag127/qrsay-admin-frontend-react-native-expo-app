@@ -1,6 +1,9 @@
 // The RCTDeviceEventEmitter is already patched in global-patch.js
 
 // Try to import react-native-gesture-handler, but use our polyfill if it fails
+// Patch Avatar
+import { Avatar } from './src/utils/patches';
+
 import React, { useEffect } from "react";
 
 // Use a try-catch to handle the import

@@ -20,7 +20,10 @@
     "fix-naming-conflicts": "node fix-naming-conflicts.js",
     "fix-entry-point": "node fix-entry-point.js",
     "fix-screens-size-issue": "node fix-screens-size-issue.js",
-    "fix-activity-indicator": "node fix-activity-indicator.js"
+    "fix-activity-indicator": "node fix-activity-indicator.js",
+    "run-with-fixes": "node run-with-fixes.js",
+    "fix-rns-screen": "node fix-rns-screen.js",
+    "fix-avatar": "node fix-avatar.js"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.21.0",

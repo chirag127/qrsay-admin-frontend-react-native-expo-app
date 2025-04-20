@@ -86,5 +86,31 @@ try {
   console.log('Error applying patch for ActivityIndicator:', error);
 }
 
+
+// Patch RNSScreen
+try {
+  // Import our patches
+  require('./src/utils/patches');
+  console.log('Applied patch for RNSScreen');
+} catch (error) {
+  console.log('Error applying patch for RNSScreen:', error);
+}
+
+
+// Patch Avatar
+try {
+  // Override the Avatar component with our patched version
+  const { Avatar } = require('./src/utils/patches');
+  
+  // Monkey patch the react-native-elements Avatar component
+  const RNElements = require('react-native-elements');
+  if (RNElements && RNElements.Avatar) {
+    RNElements.Avatar = Avatar;
+    console.log('Applied patch for Avatar');
+  }
+} catch (error) {
+  console.log('Error applying patch for Avatar:', error);
+}
+
 // Import the real entry point
 require('./index.js');

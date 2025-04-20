@@ -217,7 +217,7 @@ const ExtrasScreen = () => {
       </View>
       
       {isLoading && !refreshing ? (
-        <ActivityIndicator size="large" color="#ff6b00" style={styles.loader} />
+        <ActivityIndicator size={50} color="#ff6b00" style={styles.loader} />
       ) : (
         <FlatList
           data={extras}

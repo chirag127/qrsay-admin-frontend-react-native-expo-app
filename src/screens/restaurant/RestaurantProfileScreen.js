@@ -378,7 +378,7 @@ const RestaurantProfileScreen = () => {
     return (
       <View style={styles.container}>
         <Header title="Restaurant Profile" />
-        <ActivityIndicator size="large" color="#ff6b00" style={styles.loader} />
+        <ActivityIndicator size={50} color="#ff6b00" style={styles.loader} />
       </View>
     );
   }

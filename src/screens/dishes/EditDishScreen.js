@@ -208,7 +208,7 @@ const EditDishScreen = () => {
     return (
       <View style={styles.container}>
         <Header title="Edit Dish" showBackButton />
-        <ActivityIndicator size="large" color="#ff6b00" style={styles.loader} />
+        <ActivityIndicator size={50} color="#ff6b00" style={styles.loader} />
       </View>
     );
   }
