@@ -3,11 +3,13 @@ import { API_ENDPOINTS } from "../constants";
 
 export const getOrdersByStatus = async (status) => {
     try {
+        // Ensure status is sent as an array named 'orderStatus' as expected by the backend
         const response = await api.put(API_ENDPOINTS.GET_ORDERS_BY_STATUS, {
-            status,
+            orderStatus: Array.isArray(status) ? status : [status],
         });
         return response.data;
     } catch (error) {
+        console.error("Error in getOrdersByStatus:", error);
         throw error;
     }
 };
