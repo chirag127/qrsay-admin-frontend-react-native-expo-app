@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     View,
     Text,
@@ -8,6 +8,7 @@ import {
     Alert,
     ScrollView,
     TouchableOpacity,
+    ActivityIndicator,
 } from "react-native";
 import {
     Appbar,
@@ -18,6 +19,7 @@ import {
     Button,
     Divider,
     Searchbar,
+    Snackbar,
 } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { useWaiterCalls } from "../../context/WaiterCallContext";
@@ -38,14 +40,75 @@ const WaiterCallsScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredCalls, setFilteredCalls] = useState([]);
     const [activeTab, setActiveTab] = useState("all");
+    const [isPolling, setIsPolling] = useState(false);
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState("");
 
+    // Reference to store polling interval
+    const pollingIntervalRef = useRef(null);
+    // Reference to store previous waiter calls count
+    const prevWaiterCallsCountRef = useRef(0);
+
+    // Initial fetch and polling setup
     useEffect(() => {
-        fetchWaiterCalls();
+        // Initial fetch
+        fetchWaiterCalls()
+            .then(() => {
+                console.log("Initial waiter calls fetch successful");
+                prevWaiterCallsCountRef.current = waiterCalls.length;
+            })
+            .catch((error) => {
+                console.error("Error in initial waiter calls fetch:", error);
+                setNotificationMessage(
+                    "Failed to fetch waiter calls. Will retry soon."
+                );
+                setShowNotification(true);
+            });
+
+        // Set up polling every 10 seconds
+        pollingIntervalRef.current = setInterval(() => {
+            pollWaiterCalls();
+        }, 10000); // 10 seconds
+
+        // Cleanup interval on unmount
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+                pollingIntervalRef.current = null;
+            }
+        };
     }, []);
 
+    // Check for changes in waiter calls
+    useEffect(() => {
+        if (
+            waiterCalls.length > prevWaiterCallsCountRef.current &&
+            prevWaiterCallsCountRef.current > 0
+        ) {
+            setNotificationMessage("New waiter calls received!");
+            setShowNotification(true);
+        }
+
+        prevWaiterCallsCountRef.current = waiterCalls.length;
+    }, [waiterCalls]);
+
+    // Filter calls when dependencies change
     useEffect(() => {
         filterCalls();
     }, [waiterCalls, searchQuery, activeTab]);
+
+    // Function to poll for waiter calls
+    const pollWaiterCalls = async () => {
+        try {
+            setIsPolling(true);
+            await fetchWaiterCalls();
+            console.log("Polling: Waiter calls fetched successfully");
+        } catch (error) {
+            console.error("Polling: Error fetching waiter calls:", error);
+        } finally {
+            setIsPolling(false);
+        }
+    };
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -202,7 +265,11 @@ const WaiterCallsScreen = ({ navigation }) => {
                     onPress={() => navigation.openDrawer()}
                 />
                 <Appbar.Content title="Waiter Calls" />
-                <Appbar.Action icon="refresh" onPress={onRefresh} />
+                {isPolling ? (
+                    <ActivityIndicator color={COLORS.white} size="small" />
+                ) : (
+                    <Appbar.Action icon="refresh" onPress={onRefresh} />
+                )}
             </Appbar.Header>
 
             <View style={styles.searchContainer}>
@@ -457,6 +524,20 @@ const WaiterCallsScreen = ({ navigation }) => {
                     </View>
                 }
             />
+
+            {/* Notification for new waiter calls */}
+            <Snackbar
+                visible={showNotification}
+                onDismiss={() => setShowNotification(false)}
+                duration={3000}
+                style={styles.snackbar}
+                action={{
+                    label: "Dismiss",
+                    onPress: () => setShowNotification(false),
+                }}
+            >
+                {notificationMessage}
+            </Snackbar>
         </View>
     );
 };
@@ -575,6 +656,9 @@ const styles = StyleSheet.create({
     errorText: {
         color: COLORS.white,
         textAlign: "center",
+    },
+    snackbar: {
+        backgroundColor: COLORS.primary,
     },
 });
 
