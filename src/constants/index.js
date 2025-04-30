@@ -83,6 +83,8 @@ export const API_ENDPOINTS = {
     // Waiter Calls
     GET_WAITER_CALLS: "/v1/waiter/getWaiterCalls",
     UPDATE_WAITER_CALL_STATUS: "/v1/waiter/updateStatus",
+    ACKNOWLEDGE_WAITER_CALL: "/v1/waiter/updateStatus",
+    RESOLVE_WAITER_CALL: "/v1/waiter/updateStatus",
 };
 
 export const SOCKET_EVENTS = {
