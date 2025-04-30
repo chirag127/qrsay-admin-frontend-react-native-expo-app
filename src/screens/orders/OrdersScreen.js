@@ -85,9 +85,12 @@ const OrdersScreen = ({ navigation }) => {
             const query = searchQuery.toLowerCase();
             orders = orders.filter(
                 (order) =>
-                    order.orderId.toLowerCase().includes(query) ||
-                    order.customerName.toLowerCase().includes(query) ||
-                    (order.customerPreferences.tableNumber &&
+                    (order.orderId &&
+                        order.orderId.toLowerCase().includes(query)) ||
+                    (order.customerName &&
+                        order.customerName.toLowerCase().includes(query)) ||
+                    (order.customerPreferences &&
+                        order.customerPreferences.tableNumber &&
                         order.customerPreferences.tableNumber
                             .toString()
                             .includes(query))
@@ -123,10 +126,12 @@ const OrdersScreen = ({ navigation }) => {
                 <View style={styles.cardHeader}>
                     <View>
                         <Title style={styles.cardTitle}>
-                            Order #{item.orderId}
+                            Order #{item.orderId || "Unknown"}
                         </Title>
                         <Paragraph style={styles.cardDate}>
-                            {new Date(item.createdAt).toLocaleString()}
+                            {item.createdAt
+                                ? new Date(item.createdAt).toLocaleString()
+                                : "Date unknown"}
                         </Paragraph>
                     </View>
                     <Badge
@@ -135,7 +140,7 @@ const OrdersScreen = ({ navigation }) => {
                             getStatusBadgeStyle(item.orderStatus),
                         ]}
                     >
-                        {item.orderStatus}
+                        {item.orderStatus || "Unknown"}
                     </Badge>
                 </View>
 
@@ -143,36 +148,50 @@ const OrdersScreen = ({ navigation }) => {
 
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Customer:</Text>
-                    <Text style={styles.infoValue}>{item.customerName}</Text>
+                    <Text style={styles.infoValue}>
+                        {item.customerName || "Anonymous"}
+                    </Text>
                 </View>
 
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Type:</Text>
                     <Text style={styles.infoValue}>
-                        {item.customerPreferences.preference}
+                        {item.customerPreferences &&
+                        item.customerPreferences.preference
+                            ? item.customerPreferences.preference
+                            : "N/A"}
                     </Text>
                 </View>
 
-                {item.customerPreferences.preference.toLowerCase() ===
-                    "dine in" && (
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Table:</Text>
-                        <Text style={styles.infoValue}>
-                            {item.customerPreferences.tableNumber}
-                        </Text>
-                    </View>
-                )}
+                {item.customerPreferences &&
+                    item.customerPreferences.preference &&
+                    item.customerPreferences.preference.toLowerCase() ===
+                        "dine in" &&
+                    item.customerPreferences.tableNumber && (
+                        <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Table:</Text>
+                            <Text style={styles.infoValue}>
+                                {item.customerPreferences.tableNumber}
+                            </Text>
+                        </View>
+                    )}
 
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Total:</Text>
                     <Text style={styles.infoValue}>
-                        ₹{item.totalAmount.toFixed(2)}
+                        ₹
+                        {item.totalAmount !== undefined &&
+                        item.totalAmount !== null
+                            ? Number(item.totalAmount).toFixed(2)
+                            : "0.00"}
                     </Text>
                 </View>
 
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Items:</Text>
-                    <Text style={styles.infoValue}>{item.items.length}</Text>
+                    <Text style={styles.infoValue}>
+                        {Array.isArray(item.items) ? item.items.length : 0}
+                    </Text>
                 </View>
 
                 <View style={styles.paymentInfo}>
@@ -193,9 +212,14 @@ const OrdersScreen = ({ navigation }) => {
                             : "Payment Pending"}
                     </Chip>
 
-                    <Chip icon="credit-card" style={styles.paymentMethodChip}>
-                        {item.paymentMethod}
-                    </Chip>
+                    {item.paymentMethod && (
+                        <Chip
+                            icon="credit-card"
+                            style={styles.paymentMethodChip}
+                        >
+                            {item.paymentMethod}
+                        </Chip>
+                    )}
                 </View>
             </Card.Content>
 

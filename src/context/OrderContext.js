@@ -61,7 +61,31 @@ export const OrderProvider = ({ children }) => {
             // Check for the correct response structure from the backend
             // The backend returns data.orderData instead of data.orders
             if (response && response.data && response.data.orderData) {
-                const orders = response.data.orderData;
+                // Ensure all orders have the required properties with default values
+                const orders = response.data.orderData.map((order) => ({
+                    _id: order._id || "",
+                    orderId: order.orderId || "",
+                    customerName: order.customerName || "Anonymous",
+                    orderStatus: order.orderStatus || status,
+                    createdAt: order.createdAt || new Date().toISOString(),
+                    totalAmount:
+                        order.totalAmount !== undefined
+                            ? Number(order.totalAmount)
+                            : 0,
+                    items: Array.isArray(order.items) ? order.items : [],
+                    paymentStatus: order.paymentStatus || "pending",
+                    paymentMethod: order.paymentMethod || "",
+                    customerPreferences: {
+                        preference:
+                            order.customerPreferences?.preference || "N/A",
+                        tableNumber:
+                            order.customerPreferences?.tableNumber || "",
+                        ...order.customerPreferences,
+                    },
+                    ...order,
+                }));
+
+                console.log(`Fetched ${orders.length} ${status} orders`);
 
                 switch (status) {
                     case ORDER_STATUS.PENDING:
@@ -81,6 +105,7 @@ export const OrderProvider = ({ children }) => {
                 }
             } else {
                 // If no orders are found, set an empty array
+                console.log(`No ${status} orders found`);
                 switch (status) {
                     case ORDER_STATUS.PENDING:
                         setPendingOrders([]);
@@ -127,10 +152,39 @@ export const OrderProvider = ({ children }) => {
             const response = await orderService.getOrdersByStatus("dineIn");
 
             if (response && response.data && response.data.orders) {
-                setActiveDineIn(response.data.orders);
+                // Ensure all orders have the required properties with default values
+                const orders = response.data.orders.map((order) => ({
+                    _id: order._id || "",
+                    orderId: order.orderId || "",
+                    customerName: order.customerName || "Anonymous",
+                    orderStatus: order.orderStatus || "dineIn",
+                    createdAt: order.createdAt || new Date().toISOString(),
+                    totalAmount:
+                        order.totalAmount !== undefined
+                            ? Number(order.totalAmount)
+                            : 0,
+                    items: Array.isArray(order.items) ? order.items : [],
+                    paymentStatus: order.paymentStatus || "pending",
+                    paymentMethod: order.paymentMethod || "",
+                    customerPreferences: {
+                        preference:
+                            order.customerPreferences?.preference || "Dine In",
+                        tableNumber:
+                            order.customerPreferences?.tableNumber || "",
+                        ...order.customerPreferences,
+                    },
+                    ...order,
+                }));
+
+                console.log(`Fetched ${orders.length} active dine-in orders`);
+                setActiveDineIn(orders);
+            } else {
+                console.log("No active dine-in orders found");
+                setActiveDineIn([]);
             }
         } catch (err) {
             console.error("Error fetching active dine-in:", err);
+            setActiveDineIn([]);
             throw err;
         }
     };
