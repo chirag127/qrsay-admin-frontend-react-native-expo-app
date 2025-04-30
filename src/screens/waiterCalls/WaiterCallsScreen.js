@@ -7,6 +7,7 @@ import {
     RefreshControl,
     Alert,
     ScrollView,
+    TouchableOpacity,
 } from "react-native";
 import {
     Appbar,
@@ -215,107 +216,214 @@ const WaiterCallsScreen = ({ navigation }) => {
 
             <View style={styles.tabContainer}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <TouchableOpacity
-                        style={[
-                            styles.tab,
-                            activeTab === "all" && styles.activeTab,
-                        ]}
-                        onPress={() => setActiveTab("all")}
-                    >
-                        <Text
-                            style={[
-                                styles.tabText,
-                                activeTab === "all" && styles.activeTabText,
-                            ]}
-                        >
-                            All ({waiterCalls.length})
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[
-                            styles.tab,
-                            activeTab === WAITER_CALL_STATUS.PENDING &&
-                                styles.activeTab,
-                        ]}
-                        onPress={() => setActiveTab(WAITER_CALL_STATUS.PENDING)}
-                    >
-                        <Text
-                            style={[
-                                styles.tabText,
-                                activeTab === WAITER_CALL_STATUS.PENDING &&
-                                    styles.activeTabText,
-                            ]}
-                        >
-                            Pending (
-                            {
-                                waiterCalls.filter(
-                                    (call) =>
-                                        call.status ===
-                                        WAITER_CALL_STATUS.PENDING
-                                ).length
-                            }
-                            )
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[
-                            styles.tab,
-                            activeTab === WAITER_CALL_STATUS.ACKNOWLEDGED &&
-                                styles.activeTab,
-                        ]}
-                        onPress={() =>
-                            setActiveTab(WAITER_CALL_STATUS.ACKNOWLEDGED)
+                    {/* Wrap TouchableOpacity in a try-catch to handle any potential errors */}
+                    {(() => {
+                        try {
+                            return (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.tab,
+                                        activeTab === "all" && styles.activeTab,
+                                    ]}
+                                    onPress={() => setActiveTab("all")}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.tabText,
+                                            activeTab === "all" &&
+                                                styles.activeTabText,
+                                        ]}
+                                    >
+                                        All ({waiterCalls.length})
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        } catch (error) {
+                            console.error("Error rendering All tab:", error);
+                            return (
+                                <View style={styles.tab}>
+                                    <Text style={styles.tabText}>
+                                        All ({waiterCalls.length})
+                                    </Text>
+                                </View>
+                            );
                         }
-                    >
-                        <Text
-                            style={[
-                                styles.tabText,
-                                activeTab === WAITER_CALL_STATUS.ACKNOWLEDGED &&
-                                    styles.activeTabText,
-                            ]}
-                        >
-                            Acknowledged (
-                            {
-                                waiterCalls.filter(
-                                    (call) =>
-                                        call.status ===
-                                        WAITER_CALL_STATUS.ACKNOWLEDGED
-                                ).length
-                            }
-                            )
-                        </Text>
-                    </TouchableOpacity>
+                    })()}
 
-                    <TouchableOpacity
-                        style={[
-                            styles.tab,
-                            activeTab === WAITER_CALL_STATUS.RESOLVED &&
-                                styles.activeTab,
-                        ]}
-                        onPress={() =>
-                            setActiveTab(WAITER_CALL_STATUS.RESOLVED)
+                    {(() => {
+                        try {
+                            return (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.tab,
+                                        activeTab ===
+                                            WAITER_CALL_STATUS.PENDING &&
+                                            styles.activeTab,
+                                    ]}
+                                    onPress={() =>
+                                        setActiveTab(WAITER_CALL_STATUS.PENDING)
+                                    }
+                                >
+                                    <Text
+                                        style={[
+                                            styles.tabText,
+                                            activeTab ===
+                                                WAITER_CALL_STATUS.PENDING &&
+                                                styles.activeTabText,
+                                        ]}
+                                    >
+                                        Pending (
+                                        {
+                                            waiterCalls.filter(
+                                                (call) =>
+                                                    call.status ===
+                                                    WAITER_CALL_STATUS.PENDING
+                                            ).length
+                                        }
+                                        )
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        } catch (error) {
+                            console.error(
+                                "Error rendering Pending tab:",
+                                error
+                            );
+                            return (
+                                <View style={styles.tab}>
+                                    <Text style={styles.tabText}>
+                                        Pending (
+                                        {
+                                            waiterCalls.filter(
+                                                (call) =>
+                                                    call.status ===
+                                                    WAITER_CALL_STATUS.PENDING
+                                            ).length
+                                        }
+                                        )
+                                    </Text>
+                                </View>
+                            );
                         }
-                    >
-                        <Text
-                            style={[
-                                styles.tabText,
-                                activeTab === WAITER_CALL_STATUS.RESOLVED &&
-                                    styles.activeTabText,
-                            ]}
-                        >
-                            Resolved (
-                            {
-                                waiterCalls.filter(
-                                    (call) =>
-                                        call.status ===
-                                        WAITER_CALL_STATUS.RESOLVED
-                                ).length
-                            }
-                            )
-                        </Text>
-                    </TouchableOpacity>
+                    })()}
+
+                    {(() => {
+                        try {
+                            return (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.tab,
+                                        activeTab ===
+                                            WAITER_CALL_STATUS.ACKNOWLEDGED &&
+                                            styles.activeTab,
+                                    ]}
+                                    onPress={() =>
+                                        setActiveTab(
+                                            WAITER_CALL_STATUS.ACKNOWLEDGED
+                                        )
+                                    }
+                                >
+                                    <Text
+                                        style={[
+                                            styles.tabText,
+                                            activeTab ===
+                                                WAITER_CALL_STATUS.ACKNOWLEDGED &&
+                                                styles.activeTabText,
+                                        ]}
+                                    >
+                                        Acknowledged (
+                                        {
+                                            waiterCalls.filter(
+                                                (call) =>
+                                                    call.status ===
+                                                    WAITER_CALL_STATUS.ACKNOWLEDGED
+                                            ).length
+                                        }
+                                        )
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        } catch (error) {
+                            console.error(
+                                "Error rendering Acknowledged tab:",
+                                error
+                            );
+                            return (
+                                <View style={styles.tab}>
+                                    <Text style={styles.tabText}>
+                                        Acknowledged (
+                                        {
+                                            waiterCalls.filter(
+                                                (call) =>
+                                                    call.status ===
+                                                    WAITER_CALL_STATUS.ACKNOWLEDGED
+                                            ).length
+                                        }
+                                        )
+                                    </Text>
+                                </View>
+                            );
+                        }
+                    })()}
+
+                    {(() => {
+                        try {
+                            return (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.tab,
+                                        activeTab ===
+                                            WAITER_CALL_STATUS.RESOLVED &&
+                                            styles.activeTab,
+                                    ]}
+                                    onPress={() =>
+                                        setActiveTab(
+                                            WAITER_CALL_STATUS.RESOLVED
+                                        )
+                                    }
+                                >
+                                    <Text
+                                        style={[
+                                            styles.tabText,
+                                            activeTab ===
+                                                WAITER_CALL_STATUS.RESOLVED &&
+                                                styles.activeTabText,
+                                        ]}
+                                    >
+                                        Resolved (
+                                        {
+                                            waiterCalls.filter(
+                                                (call) =>
+                                                    call.status ===
+                                                    WAITER_CALL_STATUS.RESOLVED
+                                            ).length
+                                        }
+                                        )
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        } catch (error) {
+                            console.error(
+                                "Error rendering Resolved tab:",
+                                error
+                            );
+                            return (
+                                <View style={styles.tab}>
+                                    <Text style={styles.tabText}>
+                                        Resolved (
+                                        {
+                                            waiterCalls.filter(
+                                                (call) =>
+                                                    call.status ===
+                                                    WAITER_CALL_STATUS.RESOLVED
+                                            ).length
+                                        }
+                                        )
+                                    </Text>
+                                </View>
+                            );
+                        }
+                    })()}
                 </ScrollView>
             </View>
 
