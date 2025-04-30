@@ -75,10 +75,43 @@ export const API_ENDPOINTS = {
     EDIT_CATEGORY: "/v1/restaurant/dishes/editCategory",
     DELETE_CATEGORY: "/v1/restaurant/dishes/deleteCategory",
 
+    // Extras
+    GET_EXTRAS: "/v1/restaurant/dishes/getExtras",
+    ADD_EXTRA: "/v1/restaurant/dishes/addExtra",
+    EDIT_EXTRA: "/v1/restaurant/dishes/editExtra",
+    DELETE_EXTRA: "/v1/restaurant/dishes/deleteExtra",
+
+    // Choices
+    GET_CHOICES: "/v1/restaurant/dishes/getChoices",
+    ADD_CHOICE: "/v1/restaurant/dishes/addChoice",
+    EDIT_CHOICE: "/v1/restaurant/dishes/editChoice",
+    DELETE_CHOICE: "/v1/restaurant/dishes/deleteChoice",
+
+    // Tables
+    GET_TABLES: "/v1/restaurant/getAllTables",
+    ADD_TABLE: "/v1/restaurant/createTableEntry",
+    EDIT_TABLE: "/v1/restaurant/editTableById",
+    DELETE_TABLE: "/v1/restaurant/deleteTableById",
+
+    // Rooms
+    GET_ROOMS: "/v1/restaurant/getAllRooms",
+    ADD_ROOM: "/v1/restaurant/createRoomEntry",
+    EDIT_ROOM: "/v1/restaurant/editRoomById",
+    DELETE_ROOM: "/v1/restaurant/deleteRoomById",
+
     // Users
     GET_USERS: "/v1/admin/viewAllUsersOfRestaurant",
     ADD_USER: "/v1/user/createUser",
     EDIT_USER: "/v1/user/editUser",
+    DELETE_USER: "/v1/user/deleteUser",
+
+    // Customers
+    GET_CUSTOMERS: "/v1/customer/getCustomers",
+    GET_CUSTOMER_DETAILS: "/v1/customer/getCustomerDetails",
+
+    // Reviews
+    GET_REVIEWS: "/v1/restaurant/reviews",
+    REPLY_TO_REVIEW: "/v1/restaurant/replyToReview",
 
     // Waiter Calls
     GET_WAITER_CALLS: "/v1/waiter/getWaiterCalls",

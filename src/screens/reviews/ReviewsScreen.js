@@ -22,54 +22,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, SIZES } from "../../constants";
 import LoadingScreen from "../common/LoadingScreen";
-
-// This would typically come from an API service
-const getReviews = async () => {
-    // Simulate API call
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                data: {
-                    reviews: [
-                        {
-                            _id: "1",
-                            customerName: "John Doe",
-                            rating: 5,
-                            comment:
-                                "Amazing food and excellent service! Will definitely come back again.",
-                            date: "2023-06-15T12:30:00.000Z",
-                            reply: null,
-                            dishName: "Butter Chicken",
-                            orderId: "ORD123456",
-                        },
-                        {
-                            _id: "2",
-                            customerName: "Jane Smith",
-                            rating: 4,
-                            comment:
-                                "Food was delicious but took a bit longer to arrive than expected.",
-                            date: "2023-06-10T15:45:00.000Z",
-                            reply: "Thank you for your feedback. We apologize for the delay and are working to improve our service times.",
-                            dishName: "Paneer Tikka",
-                            orderId: "ORD123457",
-                        },
-                        {
-                            _id: "3",
-                            customerName: "Bob Johnson",
-                            rating: 3,
-                            comment:
-                                "Average experience. Food was okay but nothing special.",
-                            date: "2023-05-28T09:15:00.000Z",
-                            reply: null,
-                            dishName: "Vegetable Biryani",
-                            orderId: "ORD123458",
-                        },
-                    ],
-                },
-            });
-        }, 1000);
-    });
-};
+import * as reviewService from "../../services/reviewService";
 
 const ReviewsScreen = ({ navigation }) => {
     const [reviews, setReviews] = useState([]);
@@ -93,7 +46,7 @@ const ReviewsScreen = ({ navigation }) => {
             setLoading(true);
             setError(null);
 
-            const response = await getReviews();
+            const response = await reviewService.getReviews();
 
             if (response && response.data && response.data.reviews) {
                 setReviews(response.data.reviews);
@@ -148,24 +101,46 @@ const ReviewsScreen = ({ navigation }) => {
                 },
                 {
                     text: "Submit",
-                    onPress: (text) => {
+                    onPress: async (text) => {
                         if (text && text.trim()) {
-                            // This would typically be an API call
-                            // const response = await replyToReview(reviewId, text);
+                            try {
+                                setLoading(true);
 
-                            // For now, update the local state
-                            setReviews(
-                                reviews.map((review) =>
-                                    review._id === reviewId
-                                        ? { ...review, reply: text }
-                                        : review
-                                )
-                            );
+                                const replyData = {
+                                    reviewId,
+                                    replyText: text,
+                                };
 
-                            Alert.alert(
-                                "Success",
-                                "Reply submitted successfully"
-                            );
+                                const response =
+                                    await reviewService.replyToReview(
+                                        replyData
+                                    );
+
+                                if (response && response.success) {
+                                    // Refresh the reviews list
+                                    await fetchReviews();
+                                    Alert.alert(
+                                        "Success",
+                                        "Reply submitted successfully"
+                                    );
+                                } else {
+                                    throw new Error(
+                                        response?.message ||
+                                            "Failed to submit reply"
+                                    );
+                                }
+                            } catch (error) {
+                                console.error(
+                                    "Error replying to review:",
+                                    error
+                                );
+                                Alert.alert(
+                                    "Error",
+                                    error.message || "Failed to submit reply"
+                                );
+                            } finally {
+                                setLoading(false);
+                            }
                         }
                     },
                 },
