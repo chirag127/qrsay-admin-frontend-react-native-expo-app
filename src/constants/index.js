@@ -60,8 +60,11 @@ export const API_ENDPOINTS = {
     CHANGE_RESTAURANT_STATUS: "/v1/restaurant/changeRestaurantStatus",
 
     // Orders
-    GET_ORDERS_BY_STATUS: "/v1/orders/getRestaurantOrdersByStatus",
+    GET_ORDERS_BY_STATUS: "/v1/orders/getRestaurantOrdersByStatus", // This is a PUT request, not GET
     CHANGE_ORDER_STATUS: "/v1/orders/changeOrderStatus",
+    GET_ORDER_BY_ID: "/v1/orders/getOrderwithOrderId", // Add orderId as path parameter
+    DELETE_ORDER: "/v1/orders/deleteOrderById", // Add orderId as path parameter
+    GENERATE_BILL: "/v1/orders/generateBill", // Add orderId as path parameter
 
     // Dishes
     GET_DISHES: "/v1/restaurant/dishes/getDishes",
@@ -114,10 +117,10 @@ export const API_ENDPOINTS = {
     REPLY_TO_REVIEW: "/v1/restaurant/replyToReview",
 
     // Waiter Calls
-    GET_WAITER_CALLS: "/v1/waiter/getWaiterCalls",
-    UPDATE_WAITER_CALL_STATUS: "/v1/waiter/updateStatus",
-    ACKNOWLEDGE_WAITER_CALL: "/v1/waiter/updateStatus",
-    RESOLVE_WAITER_CALL: "/v1/waiter/updateStatus",
+    GET_WAITER_CALLS: "/v1/waiter/getWaiterCalls", // Protected route requiring authentication
+    GET_WAITER_CALLS_PUBLIC: "/v1/waiter/getWaiterCallsPublic", // Public route for testing
+    UPDATE_WAITER_CALL_STATUS: "/v1/waiter/updateStatus", // PATCH request with callId and status in body
+    CALL_WAITER: "/v1/waiter/callWaiter", // POST request for customers to call a waiter
 };
 
 export const SOCKET_EVENTS = {
