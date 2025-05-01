@@ -121,7 +121,8 @@ export const WaiterCallProvider = ({ children }) => {
                     // Load initial waiter calls
                     await fetchWaiterCalls();
 
-                    // Set up polling every 10 seconds as a fallback
+                    // Set up polling every 60 seconds as a fallback
+                    // This is only a fallback in case socket connection fails
                     if (pollingIntervalRef.current) {
                         clearInterval(pollingIntervalRef.current);
                     }
@@ -129,12 +130,24 @@ export const WaiterCallProvider = ({ children }) => {
                     pollingIntervalRef.current = setInterval(async () => {
                         try {
                             if (!isMounted) return;
-                            console.log("Polling: Fetching waiter calls...");
-                            await fetchWaiterCalls();
+                            // Only poll if socket is not connected
+                            if (
+                                !socketRef.current ||
+                                !socketRef.current.connected
+                            ) {
+                                console.log(
+                                    "Socket not connected, polling for waiter calls..."
+                                );
+                                await fetchWaiterCalls();
+                            } else {
+                                console.log(
+                                    "Socket connected, skipping polling"
+                                );
+                            }
                         } catch (error) {
                             console.error("Error in polling interval:", error);
                         }
-                    }, 10000); // 10 seconds
+                    }, 60000); // 60 seconds
                 }
             } catch (error) {
                 console.error("Error setting up socket and polling:", error);

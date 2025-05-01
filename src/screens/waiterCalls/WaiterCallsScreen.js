@@ -40,16 +40,13 @@ const WaiterCallsScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredCalls, setFilteredCalls] = useState([]);
     const [activeTab, setActiveTab] = useState("all");
-    const [isPolling, setIsPolling] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState("");
 
-    // Reference to store polling interval
-    const pollingIntervalRef = useRef(null);
     // Reference to store previous waiter calls count
     const prevWaiterCallsCountRef = useRef(0);
 
-    // Initial fetch and polling setup
+    // Initial fetch setup - no polling here as it's handled in the context
     useEffect(() => {
         // Initial fetch
         fetchWaiterCalls()
@@ -65,18 +62,10 @@ const WaiterCallsScreen = ({ navigation }) => {
                 setShowNotification(true);
             });
 
-        // Set up polling every 10 seconds
-        pollingIntervalRef.current = setInterval(() => {
-            pollWaiterCalls();
-        }, 10000); // 10 seconds
+        // No polling setup here - we rely on the context's socket connection
+        // and its fallback polling mechanism
 
-        // Cleanup interval on unmount
-        return () => {
-            if (pollingIntervalRef.current) {
-                clearInterval(pollingIntervalRef.current);
-                pollingIntervalRef.current = null;
-            }
-        };
+        // No cleanup needed since we're not setting up any intervals
     }, []);
 
     // Check for changes in waiter calls
@@ -97,18 +86,7 @@ const WaiterCallsScreen = ({ navigation }) => {
         filterCalls();
     }, [waiterCalls, searchQuery, activeTab]);
 
-    // Function to poll for waiter calls
-    const pollWaiterCalls = async () => {
-        try {
-            setIsPolling(true);
-            await fetchWaiterCalls();
-            console.log("Polling: Waiter calls fetched successfully");
-        } catch (error) {
-            console.error("Polling: Error fetching waiter calls:", error);
-        } finally {
-            setIsPolling(false);
-        }
-    };
+    // We've removed the polling function as it's now handled in the context
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -265,11 +243,7 @@ const WaiterCallsScreen = ({ navigation }) => {
                     onPress={() => navigation.openDrawer()}
                 />
                 <Appbar.Content title="Waiter Calls" />
-                {isPolling ? (
-                    <ActivityIndicator color={COLORS.white} size="small" />
-                ) : (
-                    <Appbar.Action icon="refresh" onPress={onRefresh} />
-                )}
+                <Appbar.Action icon="refresh" onPress={onRefresh} />
             </Appbar.Header>
 
             <View style={styles.searchContainer}>
