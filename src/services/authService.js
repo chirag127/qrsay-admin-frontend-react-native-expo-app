@@ -138,6 +138,7 @@ export const logout = async () => {
         console.log("Logging out user");
         await AsyncStorage.removeItem("token");
         await AsyncStorage.removeItem("user");
+        await AsyncStorage.removeItem("restaurant");
         return true;
     } catch (error) {
         console.error("Logout error:", error);

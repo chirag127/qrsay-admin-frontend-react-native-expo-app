@@ -105,8 +105,9 @@ export const API_ENDPOINTS = {
     // Users
     GET_USERS: "/v1/admin/viewAllUsersOfRestaurant",
     ADD_USER: "/v1/user/createUser",
-    EDIT_USER: "/v1/user/editUser",
-    DELETE_USER: "/v1/user/deleteUser",
+    EDIT_USER: "/v1/user/editUser/:id", // This endpoint requires an ID parameter
+    DELETE_USER: "/v1/user/deleteUser/:id", // This endpoint requires an ID parameter
+    GET_USER: "/v1/user/getUser/:id", // Add this endpoint for getting a specific user
 
     // Customers
     GET_CUSTOMERS: "/v1/customer/getCustomers",

@@ -50,9 +50,21 @@ const UsersScreen = ({ navigation }) => {
 
             const response = await userService.getUsers();
 
+            // Check for different possible response structures
             if (response && response.data && response.data.users) {
                 setUsers(response.data.users);
+            } else if (
+                response &&
+                response.data &&
+                Array.isArray(response.data)
+            ) {
+                // Handle case where API returns array directly
+                setUsers(response.data);
+            } else if (response && Array.isArray(response)) {
+                // Handle case where API returns array directly
+                setUsers(response);
             } else {
+                console.warn("Unexpected response format:", response);
                 setUsers([]);
             }
         } catch (err) {
@@ -93,7 +105,11 @@ const UsersScreen = ({ navigation }) => {
         try {
             const response = await userService.deleteUser(selectedUser._id);
 
-            if (response && response.success) {
+            // Check for success based on the actual API response structure
+            if (
+                response &&
+                (response.success || response.status === "success")
+            ) {
                 // Refresh the users list
                 await fetchUsers();
                 setDeleteDialogVisible(false);
@@ -267,7 +283,11 @@ const UsersScreen = ({ navigation }) => {
                         <Button onPress={() => setDeleteDialogVisible(false)}>
                             Cancel
                         </Button>
-                        <Button onPress={handleDeleteUser} color={COLORS.error}>
+                        <Button
+                            onPress={handleDeleteUser}
+                            textColor={COLORS.error}
+                            mode="text"
+                        >
                             Delete
                         </Button>
                     </Dialog.Actions>

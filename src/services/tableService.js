@@ -32,12 +32,25 @@ export const addTable = async (tableData) => {
 
 /**
  * Edits an existing table
- * @param {Object} tableData - The table data to update
+ * @param {Object} tableData - The table data to update including the table ID
  * @returns {Promise<Object>} Promise that resolves to the response data
  */
 export const editTable = async (tableData) => {
     try {
+        if (!tableData._id) {
+            throw new Error("Table ID is required for editing a table");
+        }
+
+        // For editTableById endpoint, we need to include the ID in the URL or body
+        // Check the backend implementation to determine the correct approach
+        // Option 1: Include ID in URL
+        // const url = `${API_ENDPOINTS.EDIT_TABLE}/${tableData._id}`;
+        // const { _id, ...tableDataWithoutId } = tableData;
+        // const response = await api.patch(url, tableDataWithoutId);
+
+        // Option 2: Include ID in body (more common)
         const response = await api.patch(API_ENDPOINTS.EDIT_TABLE, tableData);
+
         return response.data;
     } catch (error) {
         console.error("Error editing table:", error);
@@ -52,7 +65,14 @@ export const editTable = async (tableData) => {
  */
 export const deleteTable = async (tableId) => {
     try {
-        const response = await api.delete(`${API_ENDPOINTS.DELETE_TABLE}/${tableId}`);
+        if (!tableId) {
+            throw new Error("Table ID is required for deleting a table");
+        }
+
+        // For deleteTableById endpoint, we need to include the ID in the URL
+        const url = `${API_ENDPOINTS.DELETE_TABLE}/${tableId}`;
+        const response = await api.delete(url);
+
         return response.data;
     } catch (error) {
         console.error("Error deleting table:", error);

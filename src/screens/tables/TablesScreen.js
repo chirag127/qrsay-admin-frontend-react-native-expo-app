@@ -50,9 +50,21 @@ const TablesScreen = ({ navigation }) => {
 
             const response = await tableService.getTables();
 
+            // Check for different possible response structures
             if (response && response.data && response.data.tables) {
                 setTables(response.data.tables);
+            } else if (
+                response &&
+                response.data &&
+                Array.isArray(response.data)
+            ) {
+                // Handle case where API returns array directly
+                setTables(response.data);
+            } else if (response && Array.isArray(response)) {
+                // Handle case where API returns array directly
+                setTables(response);
             } else {
+                console.warn("Unexpected response format:", response);
                 setTables([]);
             }
         } catch (err) {
@@ -157,7 +169,11 @@ const TablesScreen = ({ navigation }) => {
         try {
             const response = await tableService.deleteTable(selectedTable._id);
 
-            if (response && response.success) {
+            // Check for success based on the actual API response structure
+            if (
+                response &&
+                (response.success || response.status === "success")
+            ) {
                 // Refresh the tables list
                 await fetchTables();
                 setDeleteDialogVisible(false);

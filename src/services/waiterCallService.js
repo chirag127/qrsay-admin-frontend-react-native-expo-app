@@ -8,17 +8,58 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
  */
 export const getWaiterCalls = async () => {
     try {
-        // Get the restaurant ID from user data in AsyncStorage
-        const userDataString = await AsyncStorage.getItem("user");
-        const userData = userDataString ? JSON.parse(userDataString) : null;
-        const restaurantId = userData?.restaurantKey;
+        // Try to get the restaurant ID from multiple sources
+        let restaurantId = null;
+
+        // First, try to get it from the restaurant data in AsyncStorage
+        try {
+            const restaurantDataString = await AsyncStorage.getItem(
+                "restaurant"
+            );
+            if (restaurantDataString) {
+                const restaurantData = JSON.parse(restaurantDataString);
+                restaurantId = restaurantData?._id;
+                console.log(
+                    "Found restaurant ID in restaurant data:",
+                    restaurantId
+                );
+            }
+        } catch (e) {
+            console.warn("Error parsing restaurant data from AsyncStorage:", e);
+        }
+
+        // If not found, try to get it from user data
+        if (!restaurantId) {
+            try {
+                const userDataString = await AsyncStorage.getItem("user");
+                if (userDataString) {
+                    const userData = JSON.parse(userDataString);
+                    // Try different possible keys for restaurant ID
+                    restaurantId =
+                        userData?.restaurantKey ||
+                        userData?.restaurantId ||
+                        userData?.restaurant;
+                    console.log(
+                        "Found restaurant ID in user data:",
+                        restaurantId
+                    );
+                }
+            } catch (e) {
+                console.warn("Error parsing user data from AsyncStorage:", e);
+            }
+        }
 
         if (!restaurantId) {
-            throw new Error("Restaurant ID not found in user data");
+            throw new Error(
+                "Restaurant ID not found in user or restaurant data"
+            );
         }
 
         // Try the authenticated endpoint first
         try {
+            console.log(
+                `Calling authenticated waiter calls endpoint with restaurantId: ${restaurantId}`
+            );
             const response = await api.get(API_ENDPOINTS.GET_WAITER_CALLS, {
                 params: { restaurantId },
             });
@@ -30,6 +71,9 @@ export const getWaiterCalls = async () => {
             );
 
             // Fall back to the public endpoint if the authenticated one fails
+            console.log(
+                `Calling public waiter calls endpoint with restaurantId: ${restaurantId}`
+            );
             const publicResponse = await api.get(
                 API_ENDPOINTS.GET_WAITER_CALLS_PUBLIC,
                 {
@@ -52,16 +96,56 @@ export const getWaiterCalls = async () => {
  */
 export const updateWaiterCallStatus = async (callId, status) => {
     try {
-        // Get the restaurant ID from user data in AsyncStorage
-        const userDataString = await AsyncStorage.getItem("user");
-        const userData = userDataString ? JSON.parse(userDataString) : null;
-        const restaurantId = userData?.restaurantKey;
+        // Try to get the restaurant ID from multiple sources
+        let restaurantId = null;
 
-        if (!restaurantId) {
-            throw new Error("Restaurant ID not found in user data");
+        // First, try to get it from the restaurant data in AsyncStorage
+        try {
+            const restaurantDataString = await AsyncStorage.getItem(
+                "restaurant"
+            );
+            if (restaurantDataString) {
+                const restaurantData = JSON.parse(restaurantDataString);
+                restaurantId = restaurantData?._id;
+                console.log(
+                    "Found restaurant ID in restaurant data:",
+                    restaurantId
+                );
+            }
+        } catch (e) {
+            console.warn("Error parsing restaurant data from AsyncStorage:", e);
         }
 
-        console.log(`Updating waiter call status: ${callId} to ${status}`);
+        // If not found, try to get it from user data
+        if (!restaurantId) {
+            try {
+                const userDataString = await AsyncStorage.getItem("user");
+                if (userDataString) {
+                    const userData = JSON.parse(userDataString);
+                    // Try different possible keys for restaurant ID
+                    restaurantId =
+                        userData?.restaurantKey ||
+                        userData?.restaurantId ||
+                        userData?.restaurant;
+                    console.log(
+                        "Found restaurant ID in user data:",
+                        restaurantId
+                    );
+                }
+            } catch (e) {
+                console.warn("Error parsing user data from AsyncStorage:", e);
+            }
+        }
+
+        if (!restaurantId) {
+            throw new Error(
+                "Restaurant ID not found in user or restaurant data"
+            );
+        }
+
+        console.log(
+            `Updating waiter call status: ${callId} to ${status} for restaurant: ${restaurantId}`
+        );
         const response = await api.patch(
             API_ENDPOINTS.UPDATE_WAITER_CALL_STATUS,
             {

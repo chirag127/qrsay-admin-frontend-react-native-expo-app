@@ -32,12 +32,22 @@ export const addUser = async (userData) => {
 
 /**
  * Edits an existing user
- * @param {Object} userData - The user data to update
+ * @param {Object} userData - The user data to update including the user ID
  * @returns {Promise<Object>} Promise that resolves to the response data
  */
 export const editUser = async (userData) => {
     try {
-        const response = await api.patch(API_ENDPOINTS.EDIT_USER, userData);
+        if (!userData._id) {
+            throw new Error("User ID is required for editing a user");
+        }
+
+        // Replace the :id placeholder with the actual user ID
+        const url = API_ENDPOINTS.EDIT_USER.replace(":id", userData._id);
+
+        // Remove the _id from the payload as it's already in the URL
+        const { _id, ...userDataWithoutId } = userData;
+
+        const response = await api.patch(url, userDataWithoutId);
         return response.data;
     } catch (error) {
         console.error("Error editing user:", error);
@@ -52,10 +62,39 @@ export const editUser = async (userData) => {
  */
 export const deleteUser = async (userId) => {
     try {
-        const response = await api.delete(`${API_ENDPOINTS.DELETE_USER}/${userId}`);
+        if (!userId) {
+            throw new Error("User ID is required for deleting a user");
+        }
+
+        // Replace the :id placeholder with the actual user ID
+        const url = API_ENDPOINTS.DELETE_USER.replace(":id", userId);
+
+        const response = await api.delete(url);
         return response.data;
     } catch (error) {
         console.error("Error deleting user:", error);
+        throw error;
+    }
+};
+
+/**
+ * Gets a specific user by ID
+ * @param {string} userId - The ID of the user to get
+ * @returns {Promise<Object>} Promise that resolves to the response data
+ */
+export const getUser = async (userId) => {
+    try {
+        if (!userId) {
+            throw new Error("User ID is required for getting a user");
+        }
+
+        // Replace the :id placeholder with the actual user ID
+        const url = API_ENDPOINTS.GET_USER.replace(":id", userId);
+
+        const response = await api.get(url);
+        return response.data;
+    } catch (error) {
+        console.error("Error getting user:", error);
         throw error;
     }
 };

@@ -30,7 +30,26 @@ export const AuthProvider = ({ children }) => {
                             restaurantData.data &&
                             restaurantData.data.restaurantDetail
                         ) {
-                            setRestaurant(restaurantData.data.restaurantDetail);
+                            const restaurantDetail =
+                                restaurantData.data.restaurantDetail;
+                            setRestaurant(restaurantDetail);
+
+                            // Store restaurant data in AsyncStorage for other services to use
+                            try {
+                                await AsyncStorage.setItem(
+                                    "restaurant",
+                                    JSON.stringify(restaurantDetail)
+                                );
+                                console.log(
+                                    "Restaurant data stored in AsyncStorage"
+                                );
+                            } catch (storageError) {
+                                console.error(
+                                    "Error storing restaurant data in AsyncStorage:",
+                                    storageError
+                                );
+                            }
+
                             console.log("Restaurant data loaded successfully");
                         } else {
                             console.warn(
@@ -39,6 +58,19 @@ export const AuthProvider = ({ children }) => {
                             );
                             // Set an empty restaurant object to prevent null references
                             setRestaurant({});
+
+                            // Store empty restaurant object in AsyncStorage
+                            try {
+                                await AsyncStorage.setItem(
+                                    "restaurant",
+                                    JSON.stringify({})
+                                );
+                            } catch (storageError) {
+                                console.error(
+                                    "Error storing empty restaurant data in AsyncStorage:",
+                                    storageError
+                                );
+                            }
                         }
                     } catch (restaurantError) {
                         console.error(
@@ -79,7 +111,26 @@ export const AuthProvider = ({ children }) => {
                         restaurantData.data &&
                         restaurantData.data.restaurantDetail
                     ) {
-                        setRestaurant(restaurantData.data.restaurantDetail);
+                        const restaurantDetail =
+                            restaurantData.data.restaurantDetail;
+                        setRestaurant(restaurantDetail);
+
+                        // Store restaurant data in AsyncStorage for other services to use
+                        try {
+                            await AsyncStorage.setItem(
+                                "restaurant",
+                                JSON.stringify(restaurantDetail)
+                            );
+                            console.log(
+                                "Restaurant data stored in AsyncStorage after login"
+                            );
+                        } catch (storageError) {
+                            console.error(
+                                "Error storing restaurant data in AsyncStorage after login:",
+                                storageError
+                            );
+                        }
+
                         console.log(
                             "Restaurant data loaded successfully after login"
                         );
@@ -90,6 +141,19 @@ export const AuthProvider = ({ children }) => {
                         );
                         // Set an empty restaurant object to prevent null references
                         setRestaurant({});
+
+                        // Store empty restaurant object in AsyncStorage
+                        try {
+                            await AsyncStorage.setItem(
+                                "restaurant",
+                                JSON.stringify({})
+                            );
+                        } catch (storageError) {
+                            console.error(
+                                "Error storing empty restaurant data in AsyncStorage after login:",
+                                storageError
+                            );
+                        }
                     }
                 } catch (restaurantError) {
                     console.error(
@@ -132,6 +196,18 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             await authService.logout();
+
+            // Clear restaurant data from AsyncStorage
+            try {
+                await AsyncStorage.removeItem("restaurant");
+                console.log("Restaurant data cleared from AsyncStorage");
+            } catch (storageError) {
+                console.error(
+                    "Error clearing restaurant data from AsyncStorage:",
+                    storageError
+                );
+            }
+
             setUser(null);
             setRestaurant(null);
         } catch (err) {
