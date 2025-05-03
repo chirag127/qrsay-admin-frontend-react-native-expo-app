@@ -196,6 +196,15 @@ const RootNavigator = () => {
     );
 };
 
+// Helper function to navigate to specific tabs
+export const navigateToTab = (navigation, tabName) => {
+    // First navigate to the Home screen (which contains the tab navigator)
+    navigation.navigate("Home");
+
+    // Then navigate to the specific tab
+    navigation.navigate(tabName);
+};
+
 const AppNavigator = () => {
     return (
         <NavigationContainer>
