@@ -1,0 +1,13 @@
+build:
+  url: https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App/actions/workflows/ci.yml
+coverage:
+  url: https://codecov.io/gh/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App
+tech_stack:
+  lang: TypeScript
+  framework: React Native
+lint:
+  style: Biome
+license:
+  type: CC BY-NC 4.0
+stars:
+  url: https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App
