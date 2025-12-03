@@ -1,13 +1,66 @@
-build:
-  url: https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App/actions/workflows/ci.yml
-coverage:
-  url: https://codecov.io/gh/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App
-tech_stack:
-  lang: TypeScript
-  framework: React Native
-lint:
-  style: Biome
-license:
-  type: CC BY-NC 4.0
-stars:
-  url: https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App
+# .github/badges.yml
+# Single source of truth for all repository badges.
+# Ensures consistency across READMEs and other documentation.
+# Style: flat-square
+
+status_badges:
+  - name: "Build Status"
+    image_url: "https://img.shields.io/github/actions/workflow/status/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App/ci.yml?branch=main&style=flat-square&logo=github&label=Build"
+    link_url: "https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App/actions/workflows/ci.yml"
+    markdown: "[
+![Build Status](https://img.shields.io/github/actions/workflow/status/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App/ci.yml?branch=main&style=flat-square&logo=github&label=Build)
+](https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App/actions/workflows/ci.yml)"
+
+  - name: "Code Coverage"
+    image_url: "https://img.shields.io/codecov/c/github/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App?style=flat-square&logo=codecov&label=Coverage"
+    link_url: "https://codecov.io/gh/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App"
+    markdown: "[
+![Code Coverage](https://img.shields.io/codecov/c/github/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App?style=flat-square&logo=codecov&label=Coverage)
+](https://codecov.io/gh/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App)"
+
+info_badges:
+  - name: "License"
+    image_url: "https://img.shields.io/github/license/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App?style=flat-square&color=blueviolet"
+    link_url: "https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App/blob/main/LICENSE"
+    markdown: "[
+![License](https://img.shields.io/github/license/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App?style=flat-square&color=blueviolet)
+](https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App/blob/main/LICENSE)"
+
+  - name: "GitHub Stars"
+    image_url: "https://img.shields.io/github/stars/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App?style=flat-square&logo=github&label=Stars"
+    link_url: "https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App"
+    markdown: "[
+![GitHub Stars](https://img.shields.io/github/stars/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App?style=flat-square&logo=github&label=Stars)
+](https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App)"
+
+tech_stack_badges:
+  - name: "React Native"
+    image_url: "https://img.shields.io/badge/React_Native-61DAFB?style=flat-square&logo=react&logoColor=black"
+    markdown: "
+![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=flat-square&logo=react&logoColor=black)
+"
+
+  - name: "Expo"
+    image_url: "https://img.shields.io/badge/Expo-000020?style=flat-square&logo=expo&logoColor=white"
+    markdown: "
+![Expo](https://img.shields.io/badge/Expo-000020?style=flat-square&logo=expo&logoColor=white)
+"
+
+  - name: "TypeScript"
+    image_url: "https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white"
+    markdown: "
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+"
+
+  - name: "Zustand"
+    image_url: "https://img.shields.io/badge/State-Zustand-orange?style=flat-square"
+    markdown: "
+![Zustand](https://img.shields.io/badge/State-Zustand-orange?style=flat-square)
+"
+
+tooling_badges:
+  - name: "Biome"
+    image_url: "https://img.shields.io/badge/Lint-Biome-blue?style=flat-square&logo=biome"
+    markdown: "
+![Linting & Formatting by Biome](https://img.shields.io/badge/Lint-Biome-blue?style=flat-square&logo=biome)
+"
