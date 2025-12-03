@@ -1,92 +1,134 @@
 # 🤝 Contributing to QRSay-Admin-Restaurant-Management-Mobile-App
 
-We welcome contributions to elevate the **QRSay Admin Mobile Application** into a fault-tolerant, high-performance operational system for restaurant management.
+Thank you for considering contributing to `QRSay-Admin-Restaurant-Management-Mobile-App`! We aim to maintain the highest standards of quality, performance, and maintainability, reflecting FAANG-level development practices.
 
-As per the **Apex Technical Authority** mandate, all contributions must align with **Zero-Defect, High-Velocity, Future-Proof** engineering principles.
+## 1. Our Guiding Principles
 
-## 1. Foundational Principles
+We adhere to the core principles established by the Apex Technical Authority:
 
-Before writing any code, familiarize yourself with the project's core tenets, detailed in the root `AGENTS.md` file:
+*   **Zero-Defect, High-Velocity, Future-Proof:** Every contribution should strive for excellence and be built to last.
+*   **Professional Archival Standard:** Even contributions to older or retired components must be professional and well-documented.
+*   **Context-Aware Apex Tech Stack:** We leverage the latest stable technologies, ensuring optimal performance and developer experience.
+*   **Apex Naming Convention:** All new features, components, or modules should follow the established naming patterns.
+*   **Readability and Maintainability:** Code must be clear, concise, and easy for others to understand and modify.
 
-*   **SOLID Compliance:** Design decisions must demonstrate high cohesion and low coupling.
-*   **DRY Enforcement:** Avoid redundancy at all costs.
-*   **YAGNI Philosophy:** Implement only what is currently required, but engineer with extensibility in mind.
-*   **Future-Proofing:** We are building for the **December 2025/2026** standard. Leverage modern features in React Native/Expo.
+## 2. Development Environment Setup
 
-## 2. The Apex Toolchain (Contextualized for React Native/Expo)
+Before you begin, please ensure your development environment is set up according to the project's requirements. Refer to the main `README.md` for detailed setup instructions.
 
-This project is a TypeScript/JavaScript mobile application. All development must adhere to this standard toolchain:
+Key technologies include:
 
-| Component | Standard Tool | Goal |
-| :--- | :--- | :--- |
-| **Language** | TypeScript (Strict) | Type Safety, Reduced Runtime Errors |
-| **Framework** | React Native (with Expo SDK) | Cross-Platform Native Performance |
-| **Styling** | TailwindCSS/NativeWind | Utility-First Consistency |
-| **Linter/Formatter** | Biome (Supersedes ESLint/Prettier) | Ultra-Fast Code Quality Enforcement |
-| **Unit Testing** | Vitest | Rapid, Reliable Unit Verification |
-| **E2E Testing** | Playwright | Robust Cross-Platform Workflow Validation |
+*   **Language:** TypeScript 6.x (Strict Mode is MANDATORY)
+*   **Framework:** React Native (Expo)
+*   **Build Tool:** Vite 7 (Rolldown)
+*   **Styling:** TailwindCSS v4
+*   **Native Integration:** Tauri v2.x
+*   **State Management:** Zustand
+*   **Linting/Formatting:** Biome
+*   **Testing:** Vitest (Unit), Playwright (E2E)
 
-## 3. Development Workflow
+bash
+# Clone the repository
+git clone https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App.git
+cd QRSay-Admin-Restaurant-Management-Mobile-App
 
-Follow these steps for a successful contribution merge:
+# Install dependencies (example using npm/yarn/pnpm)
+npm install
+# or
+yarn install
+# or
+pnpm install
 
-### Step 1: Repository Setup
+# Ensure your environment variables are set up as per .env.example
+cp .env.example .env
 
-1.  **Fork** this repository: `https://github.com/chirag127/QRSay-Admin-Restaurant-Management-Mobile-App`
-2.  **Clone** your fork locally:
-    bash
-    git clone https://github.com/YOUR_USERNAME/QRSay-Admin-Restaurant-Management-Mobile-App.git
-    cd QRSay-Admin-Restaurant-Management-Mobile-App
-    
-3.  **Install Dependencies** (using npm/yarn as standard for RN/Expo):
-    bash
-    npm install # or yarn install
-    
-4.  **Create a Feature Branch:** Always branch off `main`.
-    bash
-    git checkout -b feature/short-descriptive-name
-    
 
-### Step 2: Coding and Verification
+## 3. Contribution Workflow
 
-1.  **Implement Changes:** Write clean, well-documented code that adheres to the FSD (Feature-Sliced Design) where applicable.
-2.  **Local Lint & Format Check (Biome):** Run the formatter before committing.
-    bash
-    npm run format
-    
-3.  **Run Tests:** Ensure all affected unit tests pass, and consider adding new tests for new functionality.
-    bash
-    npm run test:unit
-    
-4.  **Run Verification Checks:** Ensure CI passes locally as much as possible.
-    bash
-    npm run lint
-    
+1.  **Fork the Repository:** Create your own fork of `chirag127/QRSay-Admin-Restaurant-Management-Mobile-App`.
+2.  **Create a Branch:** Make your changes in a descriptive feature branch (e.g., `feature/add-new-order-status`, `fix/menu-item-validation`). Use the prefix `feature/`, `fix/`, `chore/`, or `docs/`.
+3.  **Commit Changes:** Write clear, concise commit messages following the Conventional Commits specification.
+    *   Example: `feat(menu): add endpoint to fetch all categories`
+4.  **Test Your Changes:** Ensure all tests pass. Write new tests for any new features or bug fixes.
+    *   Run unit tests: `npm run test:unit` (or equivalent for your package manager)
+    *   Run E2E tests: `npm run test:e2e` (or equivalent)
+5.  **Lint and Format:** Ensure your code adheres to the project's standards.
+    *   Run linter: `npm run lint` (or equivalent)
+    *   Run formatter: `npm run format` (or equivalent)
+6.  **Submit a Pull Request:** Open a Pull Request from your feature branch to the `main` branch of the `chirag127/QRSay-Admin-Restaurant-Management-Mobile-App` repository.
+    *   Clearly describe your changes, the problem they solve, and how to test them.
+    *   Ensure your PR template is filled out completely.
 
-### Step 3: Commit and Pull Request
+## 4. Code Style and Standards
 
-1.  **Atomic Commits:** Ensure each commit is a logical, atomic unit of work.
-2.  **Push:** Push your branch to your fork.
-    bash
-    git push origin feature/short-descriptive-name
-    
-3.  **Open a Pull Request (PR):** Navigate to the main repository and open a PR targeting the `main` branch. **You MUST use the provided Pull Request Template.**
+*   **TypeScript:** Use TypeScript 6.x with strict type checking enabled (`strict: true` in `tsconfig.json`).
+*   **Linting & Formatting:** All code must pass Biome checks. Use `npm run format` to auto-format your code before committing.
+*   **Architecture:** Adhere to principles like SOLID, DRY, and YAGNI. For React Native, consider patterns like Feature-Sliced Design (FSD) or similar modular approaches where appropriate.
+*   **State Management:** Utilize Zustand for predictable and efficient state management.
+*   **Error Handling:** Implement robust error handling, especially for API calls and asynchronous operations. Define clear error states and user feedback mechanisms.
 
-## 4. Pull Request (PR) Requirements
+## 5. Testing Policy
 
-Every PR will be automatically checked by GitHub Actions. Manual review requires:
+*   **Unit Tests:** All new business logic, utility functions, and components should have comprehensive unit tests written using Vitest.
+*   **Integration Tests:** For interactions between multiple components or services, integration tests are encouraged.
+*   **End-to-End (E2E) Tests:** Critical user flows should be covered by E2E tests using Playwright.
+*   **Test Coverage:** Aim for high test coverage. Automated checks will be performed via CI.
 
-*   **Clear Description:** Reference the related issue number (if applicable).
-*   **Architectural Justification:** Briefly explain *why* the change was implemented the way it was, especially if deviating from established patterns.
-*   **Testing Proof:** Confirmation that new functionality is covered by **Vitest** or **Playwright** tests.
+## 6. AI AGENT DIRECTIVES (For Developers)
 
-## 5. Reporting Bugs and Requesting Features
+This project integrates with AI agents. Developers are expected to understand and adhere to these directives:
 
-Please utilize the official GitHub Issue Tracker. Use the appropriate templates:
+<details>
+<summary>Apex AI Agent Directives (Late 2025 Standards)</summary>
 
-*   **Bug Reports:** Use the `bug_report.md` template found in `.github/ISSUE_TEMPLATE/`.
-*   **Feature Requests:** Detail the business value and technical feasibility required for the addition.
+## 1. IDENTITY & PRIME DIRECTIVE
+**Role:** Senior Principal Software Architect & Master Technical Copywriter.
+**Context:** December 2025, building for 2026 standards.
+**Output Standard:** EXECUTION-ONLY.
+**Philosophy:** "Zero-Defect, High-Velocity, Future-Proof."
 
-## 6. Security Disclosure
+## 2. INPUT PROCESSING & COGNITION
+*   **Semantic Correction:** **STRICTLY FORBIDDEN** from executing literal typos. Infer technical intent based on project context.
+*   **Logic Anchor:** `README.md` is the SSOT.
+*   **Mandatory Instrumentation:** No hallucinating APIs. Research with `linkup`/`brave`. Validate with `docfork`.
 
-If you discover a security vulnerability, **DO NOT** open a public issue. Follow the procedure outlined in `.github/SECURITY.md` for responsible disclosure.
+## 3. CONTEXT-AWARE APEX TECH STACKS (LATE 2025 STANDARDS)
+*   **TARGET REPO:** `QRSay-Admin-Restaurant-Management-Mobile-App` (React Native Expo, TypeScript)
+*   **PRIMARY SCENARIO: WEB / APP / EXTENSION (TypeScript)
+    *   **Stack:** TypeScript 6.x (Strict), Vite 7 (Rolldown), Tauri v2.x (Native), WXT (Extensions).
+    *   **State:** Signals (Standardized).
+    *   **Lint/Test:** Biome (Speed) + Vitest (Unit) + Playwright (E2E).
+    *   **Architecture:** Feature-Sliced Design (FSD) is preferred.
+
+## 4. DEVELOPMENT STANDARDS
+*   **Setup:** `git clone` -> `npm install` (or equivalent).
+*   **Scripts:** Table defined in `README.md`.
+*   **Principles:** SOLID, DRY, YAGNI.
+
+## 5. CONTRIBUTION & CODE REVIEW
+*   **PRs:** Target `main` branch. Descriptive messages.
+*   **Code Review:** Focus on adherence to Apex standards, security, performance, and maintainability.
+
+## 6. TESTING & VERIFICATION
+*   **Unit Tests:** Vitest.
+*   **E2E Tests:** Playwright.
+*   **Linting:** Biome.
+
+## 7. ARCHIVAL PROTOCOL
+*   Retire components gracefully. Maintain documentation. Do not delete historical code without strong justification.
+
+</details>
+
+## 7. Reporting Security Vulnerabilities
+
+We take security very seriously. If you discover any security issues, please follow the guidelines in our `SECURITY.md` file.
+
+## 8. Code of Conduct
+
+This project adheres to the Contributor Covenant Code of Conduct. Please read the full text in the `CODE_OF_CONDUCT.md` file to understand what behaviors are expected and unacceptable.
+
+## 9. Getting Help
+
+If you have questions or need clarification on any of these guidelines, please open an issue or reach out on the project's communication channels (if established).
+
+We look forward to your contributions!
