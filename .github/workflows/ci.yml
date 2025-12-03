@@ -1,0 +1,65 @@
+name: CI
+
+# Trigger CI on push to main branch and pull requests targeting main
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Define jobs that will run as part of the workflow
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    # Define steps to execute within the job
+    steps:
+      # 1. Checkout the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js environment (for React Native/Expo)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x' # Use a recent LTS version compatible with Expo
+          cache: 'npm' # Enable npm caching for faster installs
+
+      # 3. Install project dependencies using npm (standard for React Native/Expo)
+      - name: Install Dependencies
+        run: npm install
+        # Use npm ci for cleaner installs if package-lock.json is guaranteed to be up-to-date
+
+      # 4. Linting and Formatting Check (using Biome or similar - assuming Biome is configured)
+      #    Note: For Expo/React Native, linters like ESLint are more common. This assumes a Biome config exists.
+      #    If ESLint is primary, this step would be `npm run lint`.
+      - name: Lint and Format Check
+        run: npm run lint # Assuming a 'lint' script in package.json that uses a linter (like Biome or ESLint)
+
+      # 5. Run Unit and Integration Tests (using Vitest or Jest via Expo/React Native setup)
+      #    Expo typically uses Jest, or Vitest can be integrated.
+      #    This assumes a 'test' script in package.json that runs tests.
+      - name: Run Unit/Integration Tests
+        run: npm test # Assuming a 'test' script in package.json
+
+      # 6. Build the Application (if applicable for CI - e.g., static analysis or preview builds)
+      #    For a mobile app, a full build might be complex and better handled by dedicated build services (e.g., EAS Build).
+      #    This step is a placeholder for a simple build or analysis step.
+      #    Example: `npx expo prebuild` or a build command if using a bundler like Webpack/Vite for specific outputs.
+      #    For mobile apps, a full bundle can be resource-intensive for a general CI. We'll focus on code quality.
+      #    If a bundle command exists and is quick: `run: npm run build`
+
+      # 7. (Optional) Upload code coverage if configured (e.g., using Codecov or Coveralls)
+      #    Requires setup of code coverage generation in tests and a corresponding action.
+      # - name: Upload Coverage to Codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }} # Ensure CODECOV_TOKEN is set in GitHub Secrets
+      #     files: ./coverage/coverage.xml # Adjust path as per your coverage report location
+      #     fail_ci_if_error: true
+
+      # 8. (Optional) E2E Tests (if applicable for CI - e.g., using Appium, Detox, or Playwright for web views)
+      #    Running full mobile E2E tests in CI can be complex. Consider dedicated testing environments.
+      #    Placeholder for a conceptual E2E test step.
+      # - name: Run End-to-End Tests
+      #   run: npm run e2e-tests
