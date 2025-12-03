@@ -1,45 +1,68 @@
-# Ignore the node_modules directory
-node_modules/
+# Node.js & Dependency Management
+/node_modules
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
 
-# Ignore build outputs
-build/
-dist/
+# Expo & React Native specific
+.expo/
+.expo-shared/
+/ios/Pods/
+/ios/build/
+/android/app/build/
+/android/.gradle/
+web-build/
+local-cli-config.json
+.metro-cache/
 
-# Ignore OS-specific files
+# Build & Distribution Artifacts
+/build/
+/dist/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.keystore
+/eas-build-pre-upload.tar.gz
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs & Temporary Files
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific
 .DS_Store
 Thumbs.db
 
-# Ignore IDE/editor specific files
-.vscode/
+# IDE & Editor Configuration
 .idea/
-*.swp
-*.swo
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# Ignore environment variables
-.env
-.env.*
-!.env.example
+# TypeScript & JavaScript build outputs
+*.js.map
+*.tsbuildinfo
 
-# Ignore logs
-*.log
-logs/
-
-# Ignore testing related files
+# Test & Coverage Reports
 coverage/
-*.test.js.snap
-*.spec.js.snap
-
-# Ignore Expo specific files
-.expo/
-
-# Ignore Metro Bundler cache
-.metro-cache/
-
-# Ignore fastlane directory if used
-fastlane/
-
-# Ignore temporary files
-*.tmp
-
-# Ignore compiled assets (if any separate build process)
-assets/compiled/
+.nyc_output/
