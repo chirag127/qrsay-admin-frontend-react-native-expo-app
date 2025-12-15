@@ -61,7 +61,7 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "^0.20.0",
     "react-native-webview": "13.13.5",
-    "sharp": "^0.34.1",
+    "sharp": "^0.34.5",
     "socket.io-client": "^4.8.1",
     "svgo": "^3.3.2",
     "yup": "^1.6.1"
